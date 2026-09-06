@@ -4,6 +4,15 @@ A collection of comprehensive beginner guides for developer tools and terminal u
 
 ## Available Guides
 
+- **[GitHub and GitHub CLI Guide](github-cli-guide.md)** - Complete beginner's guide to GitHub and using the GitHub CLI
+  - Key concepts with plain English analogies (push, pull, merge, branches, pull requests)
+  - Installation of Git and GitHub CLI
+  - Creating and cloning repositories
+  - Working with branches and commits
+  - Pull requests and code review
+  - Common workflows for solo and team projects
+  - GitHub CLI command reference and troubleshooting
+
 - **[NeoVim and LazyVim Guide](neovim-lazyvim-guide.md)** - Complete beginner's guide to NeoVim and LazyVim text editor
   - Installation on macOS, Ubuntu/Debian, and Arch/Omarchy Linux
   - Understanding modes and navigation
