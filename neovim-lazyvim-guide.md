@@ -4,19 +4,28 @@ A complete guide to getting started with NeoVim and LazyVim, from installation t
 
 **Platform Support:** This guide covers macOS, Ubuntu/Debian Linux, and Arch/Omarchy Linux. The core features are identical across all platforms - only installation methods differ.
 
+**Version note:** LazyVim's requirements were checked against the official LazyVim documentation at <https://lazyvim.org>. LazyVim moves, so if `:checkhealth` on your machine disagrees with this page, your machine is right.
+
 ## Table of Contents
 1. [What are NeoVim and LazyVim?](#what-are-neovim-and-lazyvim)
-2. [Installation](#installation)
-3. [Your First Time Opening NeoVim](#your-first-time-opening-neovim)
-4. [Understanding Modes](#understanding-modes)
-5. [Navigation](#navigation)
-6. [Basic Editing](#basic-editing)
-7. [Common Tasks](#common-tasks)
-8. [Settings and Configuration](#settings-and-configuration)
-9. [File Operations](#file-operations)
-10. [Search and Replace](#search-and-replace)
-11. [Windows and Splits](#windows-and-splits)
-12. [Essential Keybindings Reference](#essential-keybindings-reference)
+2. [Before You Install](#before-you-install)
+3. [Installing NeoVim](#installing-neovim)
+4. [Installing LazyVim](#installing-lazyvim)
+5. [Your First Time Opening NeoVim](#your-first-time-opening-neovim)
+6. [Understanding Modes](#understanding-modes)
+7. [Navigation](#navigation)
+8. [Basic Editing](#basic-editing)
+9. [Common Tasks](#common-tasks)
+10. [LazyVim Essentials](#lazyvim-essentials)
+11. [Settings and Configuration](#settings-and-configuration)
+12. [File Operations](#file-operations)
+13. [Search and Replace](#search-and-replace)
+14. [Windows and Splits](#windows-and-splits)
+15. [Keeping LazyVim Updated](#keeping-lazyvim-updated)
+16. [Essential Keybindings Reference](#essential-keybindings-reference)
+17. [Tips for Getting Better](#tips-for-getting-better)
+18. [Troubleshooting](#troubleshooting)
+19. [Next Steps](#next-steps)
 
 ---
 
@@ -30,106 +39,215 @@ Think of it this way: NeoVim is the engine, LazyVim is the car with all the feat
 
 ---
 
-## Installation
+## Before You Install
+
+Read this page before you run a single command. Two of the four things below are the reason most beginners get stuck on day one, and both are trivial to avoid if you know about them in advance.
+
+### LazyVim needs a recent NeoVim
+
+**LazyVim requires NeoVim 0.11.2 or newer**, built with LuaJIT. Older versions do not merely misbehave - LazyVim refuses to start and hands you an error that does not obviously say "your editor is too old".
+
+Check what you have:
+
+```bash
+nvim --version
+```
+
+The first two lines tell you everything:
+
+```
+NVIM v0.12.5
+Build type: RelWithDebInfo
+LuaJIT 2.1.1787165859
+```
+
+Version `0.12.5`, and `LuaJIT` on the third line. That machine is fine.
+
+### ⚠️ Your distribution's package is probably too old
+
+This is the trap. `sudo apt-get install neovim` is the obvious first thing to try, and on every current Debian and Ubuntu release it installs a NeoVim that LazyVim will not run:
+
+| Release | NeoVim in the default repos | Enough for LazyVim? |
+|---------|-----------------------------|---------------------|
+| Debian 12 (bookworm) | 0.7.2 | No |
+| Debian 13 (trixie) | 0.10.4 | No |
+| Ubuntu 22.04 (jammy) | 0.6.1 | No |
+| Ubuntu 24.04 (noble) | 0.9.5 | No |
+| Ubuntu 25.04 (plucky) | 0.9.5 | No |
+| Ubuntu 25.10 (questing) | 0.10.4 | No |
+
+Arch and Omarchy are fine - `pacman` tracks upstream closely. Homebrew is fine. On Debian and Ubuntu, use the official binary instead, which the next section walks through.
+
+### You need a Nerd Font
+
+LazyVim's interface uses icon glyphs that live outside normal fonts. Without a **Nerd Font (v3.0 or later)**, the UI fills with boxes, question marks, and blank rectangles. Everything still *works*, but it looks broken, and this is the single most common "did I install it wrong?" question from new LazyVim users.
+
+You install a Nerd Font once, then set it as your terminal's font. It is a terminal setting, not a NeoVim setting.
+
+1. Download one from <https://www.nerdfonts.com/font-downloads>. `JetBrainsMono Nerd Font`, `FiraCode Nerd Font`, and `Hack Nerd Font` are all good picks.
+2. Install it the way you install any font:
+   - **macOS:** open the `.ttf` files and click Install Font, or `brew install --cask font-jetbrains-mono-nerd-font`
+   - **Linux:** copy the `.ttf` files into `~/.local/share/fonts/`, then run `fc-cache -fv`
+   - **Windows:** select the `.ttf` files, right-click, Install
+3. **Change your terminal's font setting to it.** This step is the one people skip. Installing the font is not enough; your terminal has to be told to use it.
+
+Omarchy users: the default terminal is already configured with a Nerd Font, so there is nothing to do.
+
+### Other tools LazyVim expects
+
+None of these stop LazyVim from starting, but each one silently disables a feature until you install it.
+
+| Tool | What breaks without it |
+|------|------------------------|
+| `git` (2.19+) | Plugin installation |
+| `curl` | The completion engine |
+| `ripgrep` | Project-wide text search (`<leader>/`) |
+| `fd` | Fast file finding |
+| `fzf` (0.25.1+) | Fuzzy pickers |
+| A C compiler | Syntax highlighting via treesitter |
+| `lazygit` | The built-in git interface (optional) |
+
+Install them all in one go:
+
+```bash
+# macOS
+brew install git curl ripgrep fd fzf lazygit
+
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install git curl ripgrep fd-find fzf build-essential
+
+# Arch/Omarchy
+sudo pacman -S git curl ripgrep fd fzf lazygit base-devel
+```
+
+On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the usual name:
+
+```bash
+mkdir -p ~/.local/bin && ln -s "$(which fdfind)" ~/.local/bin/fd
+```
+
+You also want a terminal that supports true colour and undercurl: kitty, WezTerm, Alacritty, Ghostty, or iTerm2 all qualify.
+
+---
+
+## Installing NeoVim
+
+Whichever route you take, finish by running `nvim --version` and confirming you are on 0.11.2 or newer.
 
 ### macOS
 
-**Using Homebrew:**
 ```bash
 brew install neovim
 ```
 
-**Using Git and building from source:**
+Homebrew tracks NeoVim closely, so this gives you a current version.
+
+### Ubuntu / Debian
+
+**Do not use `apt-get install neovim`.** As the table above shows, every current release ships a version LazyVim cannot use. Install the official binary instead:
+
 ```bash
-git clone https://github.com/neovim/neovim.git
-cd neovim
-make CMAKE_BUILD_TYPE=Release
-sudo make install
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+sudo rm -rf /opt/nvim-linux-x86_64
+sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 ```
 
-### Linux - Ubuntu/Debian
+Then add it to your `PATH` by appending this line to `~/.bashrc` (or `~/.zshrc` if you use zsh):
 
-**Using apt:**
 ```bash
-sudo apt-get update
-sudo apt-get install neovim
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 ```
 
-**Using Git and building from source:**
-```bash
-# Install build dependencies
-sudo apt-get install build-essential cmake git
+Open a new terminal and check:
 
-# Clone and build
-git clone https://github.com/neovim/neovim.git
-cd neovim
-make CMAKE_BUILD_TYPE=Release
-sudo make install
+```bash
+nvim --version
 ```
 
-### Linux - Arch/Omarchy
+On ARM machines, replace `x86_64` with `arm64` in the download URL and the paths.
 
-**Using pacman:**
+To update later, run the same three commands again with a fresh download.
+
+There is also a community PPA (`ppa:neovim-ppa/unstable`) that carries current builds. It works, but it is called "unstable" for a reason and it is not maintained by the NeoVim project. The tarball above is the route the official docs recommend, and it is easy to reverse - delete `/opt/nvim-linux-x86_64` and remove the `PATH` line.
+
+### Arch / Omarchy
+
 ```bash
 sudo pacman -S neovim
 ```
 
-**Using Git and building from source:**
-```bash
-# Clone the repository
-git clone https://github.com/neovim/neovim.git
-cd neovim
+Arch's `extra` repository tracks upstream closely, so this gives you a current version.
 
-# Build and install
-make CMAKE_BUILD_TYPE=Release
-sudo make install
+---
+
+## Installing LazyVim
+
+LazyVim is not a program you install. It is a **starter configuration** you copy into place, which NeoVim then loads on startup.
+
+### 1. Back up any existing NeoVim setup
+
+NeoVim keeps files in four separate places, and leaving old ones behind causes confusing errors that look like LazyVim bugs. Move all four:
+
+```bash
+# required
+mv ~/.config/nvim{,.bak}
+
+# optional but strongly recommended
+mv ~/.local/share/nvim{,.bak}
+mv ~/.local/state/nvim{,.bak}
+mv ~/.cache/nvim{,.bak}
 ```
 
-### Setting up LazyVim
+`mv ~/.config/nvim{,.bak}` is shell shorthand for `mv ~/.config/nvim ~/.config/nvim.bak`. If a directory does not exist, `mv` will say so and you can safely ignore it.
 
-1. **Backup your existing NeoVim config (if you have one):**
-   ```bash
-   mv ~/.config/nvim ~/.config/nvim.bak
-   ```
+Nothing is deleted here. To undo the whole installation later, delete the new directories and move the `.bak` ones back.
 
-2. **Clone the LazyVim starter config using Git:**
-   ```bash
-   git clone https://github.com/LazyVim/starter ~/.config/nvim
-   ```
+### 2. Copy the starter configuration
 
-3. **Option A - Remove the .git folder (recommended for beginners):**
-   This makes it a regular configuration, not a git repository:
-   ```bash
-   rm -rf ~/.config/nvim/.git
-   ```
-
-4. **Option B - Keep it as a git repository (for updates):**
-   If you want to receive LazyVim updates via git:
-   ```bash
-   cd ~/.config/nvim
-   git pull origin main
-   ```
-
-5. **Open NeoVim:**
-   ```bash
-   nvim
-   ```
-   LazyVim will automatically install plugins on first launch (this may take a minute or two).
-
-### Verifying Installation
-
-After opening NeoVim for the first time, you should see:
-- A welcome screen with LazyVim information
-- Plugin installation happening in the background
-- No errors in red text
-
-If you see errors, try:
 ```bash
-# Inside NeoVim
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+```
+
+### 3. Remove the `.git` folder
+
+```bash
+rm -rf ~/.config/nvim/.git
+```
+
+**Do this.** The starter is a template you are meant to own and edit, not an upstream repository you track. If you keep the `.git` folder and later run `git pull` in there, you are pulling template changes on top of your own configuration, which fights your edits and can leave you with merge conflicts inside your editor config.
+
+LazyVim itself is a plugin, and plugins update through `:Lazy update` from inside NeoVim - never by pulling the starter repo. See [Keeping LazyVim Updated](#keeping-lazyvim-updated).
+
+Removing `.git` also means you can put your config in *your own* repository later, which is what most people eventually want.
+
+### 4. Start NeoVim
+
+```bash
+nvim
+```
+
+The first launch downloads and installs every plugin. This takes a minute or two and you will see a progress window filling up. Let it finish.
+
+### 5. Check your work
+
+Inside NeoVim, type this and press Enter:
+
+```
+:LazyHealth
+```
+
+That loads every plugin and reports whether each one is happy. LazyVim recommends running it right after installation. For NeoVim's own diagnostics, use:
+
+```
 :checkhealth
 ```
 
-This shows you any missing dependencies or configuration issues.
+Both produce a long report. You are looking for red `ERROR` lines. Warnings about optional providers (Python, Node, Ruby, Perl) are normal and harmless unless you specifically want those features.
+
+If you see boxes or question marks instead of icons, your terminal font is not a Nerd Font. Go back to [Before You Install](#before-you-install).
+
+---
 
 ---
 
@@ -168,6 +286,22 @@ NeoVim has different modes. This is key to understanding how it works:
 - Move the cursor to select text
 - Once selected, you can delete, copy, or modify the selection
 - Press `Escape` to return to Normal Mode
+
+### Visual Line Mode
+- Selects whole lines at a time
+- Enter by pressing `V` (capital V) in Normal Mode
+- Move up and down with `j` and `k` to grow the selection
+- This is the one you want most of the time - selecting three whole lines to delete or indent is a far more common job than selecting exactly seven characters
+- Press `Escape` to return to Normal Mode
+
+### Visual Block Mode
+- Selects a rectangle, not lines
+- Enter by pressing `Ctrl+v` in Normal Mode
+- Move the cursor to grow the block in any direction
+- Its signature trick: select a column, press `I`, type, then press `Escape`, and your text is inserted on **every** selected line at once. Excellent for commenting out a block or adding a prefix to a list.
+- Press `Escape` to return to Normal Mode
+
+**Windows users:** `Ctrl+v` is usually "paste" in your terminal, so it may never reach NeoVim. `Ctrl+q` does the same thing.
 
 ### Command Mode
 - Used to run commands
@@ -208,6 +342,10 @@ Navigation is the foundation of NeoVim. Unlike most editors, you use keys instea
 | `{line_number}G` | Jump to a specific line (e.g., `42G` goes to line 42) |
 | `Ctrl+f` | Page down |
 | `Ctrl+b` | Page up |
+| `Ctrl+d` | Half a page down |
+| `Ctrl+u` | Half a page up |
+
+> **⚠️ If you use Herdr (or tmux):** `Ctrl+b` is also the default *prefix key* in Herdr and tmux. Inside one of their panes, the multiplexer grabs `Ctrl+b` before NeoVim ever sees it, so page-up silently stops working. Use `Ctrl+u` instead - most Vim users prefer it anyway - or change the multiplexer's prefix. The [Herdr guide](herdr-guide.md#the-prefix-key) covers how.
 
 ### Search Navigation
 
@@ -331,6 +469,65 @@ You can press `u` multiple times to undo multiple changes.
 
 ---
 
+## LazyVim Essentials
+
+Everything above this point is plain NeoVim and works in any Vim. This section is the part LazyVim adds on top.
+
+### The leader key
+
+LazyVim builds almost all of its commands on a **leader key**, and in LazyVim the leader is the **Space bar**.
+
+`<leader>ff` in the documentation means: press Space, release, press `f`, press `f`. Three separate taps, not a chord.
+
+**The single most useful thing to know about LazyVim:** press Space and then wait. A menu appears listing every command that starts with Space, grouped by category. You do not have to memorize anything - you can browse. The same works after `g`, `z`, `]`, and `[`.
+
+### The commands worth knowing on day one
+
+| Keys | What it does |
+|------|--------------|
+| `<leader>ff` | Find files in the project by name |
+| `<leader><space>` | The same file finder, fewer keys |
+| `<leader>/` | Search the *text* of every file in the project |
+| `<leader>e` | Toggle the file explorer sidebar |
+| `<leader>,` | Switch between files you already have open |
+| `<leader>bd` | Close the current file |
+| `Shift+L` / `Shift+H` | Next / previous open file |
+| `<leader>qq` | Quit everything |
+| `<leader>l` | Open the plugin manager |
+| `<leader>sk` | Search every keybinding you have |
+| `<leader>?` | Show the keybindings for this file type |
+
+### Moving between splits
+
+LazyVim binds these directly, so you can skip the `Ctrl+w` prefix that plain Vim needs:
+
+| Keys | What it does |
+|------|--------------|
+| `Ctrl+h` / `Ctrl+j` / `Ctrl+k` / `Ctrl+l` | Move to the split left / below / above / right |
+| `<leader>-` | Split the window below |
+| `<leader>\|` | Split the window to the right |
+| `<leader>wd` | Close the current split |
+
+### Code navigation
+
+These need a language server, which LazyVim installs automatically the first time you open a file in a supported language.
+
+| Keys | What it does |
+|------|--------------|
+| `gd` | Go to where this thing is defined |
+| `gr` | Find everywhere it is used |
+| `K` | Show documentation for what is under the cursor |
+| `<leader>cr` | Rename it everywhere |
+| `<leader>ca` | Offer available fixes ("code actions") |
+| `<leader>cf` | Format the file |
+| `]d` / `[d` | Jump to the next / previous problem |
+
+### Saving
+
+`Ctrl+s` saves, in Normal *and* Insert mode. It is the one concession LazyVim makes to muscle memory from other editors, and it is a good one.
+
+---
+
 ## Settings and Configuration
 
 ### LazyVim Configuration Files
@@ -384,17 +581,24 @@ vim.opt.mouse = "a"                -- Enable mouse support
 Edit `~/.config/nvim/lua/config/keymaps.lua`:
 
 ```lua
--- Example: Map <leader>e to open file explorer
-local keymap = vim.keymap
+-- Format: vim.keymap.set(mode, keys, action, options)
 
--- Format: keymap.set(mode, keys, action, options)
-keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { noremap = true })
+-- Save with Ctrl+s from Normal, Insert, and Visual mode
+vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+
+-- Clear search highlighting with <leader>h
+vim.keymap.set("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "Clear highlights" })
 ```
 
 - `"n"` = Normal Mode
 - `"i"` = Insert Mode
 - `"v"` = Visual Mode
 - `"<leader>"` = Space key (by default)
+- `desc` is the label LazyVim shows in the Space menu, so always set it
+
+**Do not guess at plugin commands.** A mapping that calls a command a plugin does not provide fails silently until you press the key, and then reports an error you have to decode. To find the real command, run `<leader>sC` to search the commands that actually exist, or `<leader>sk` to see what an existing key is already bound to and copy that.
+
+**Before you add a mapping, check whether LazyVim already has one.** It ships several hundred. `<leader>sk` searches them all.
 
 ---
 
@@ -406,8 +610,13 @@ keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { noremap = true 
 |---------|--------|
 | `nvim filename` | Open a file from the terminal |
 | `:e filename` | Open a file within NeoVim |
-| `:e .` | Open the file browser |
-| `Ctrl+p` | Quick file search (with LazyVim) |
+| `<leader>e` | Open the file explorer sidebar (LazyVim) |
+| `<leader>ff` | Fuzzy-find files in the project (LazyVim) |
+| `<leader><space>` | The same file finder, on a faster key (LazyVim) |
+
+`<leader>` is the Space bar in LazyVim. So `<leader>ff` means: press Space, then `f`, then `f`.
+
+Plain Vim has a bare-bones directory browser you reach with `:e .`, and older tutorials point you at it. In LazyVim you want `<leader>e` instead: it opens LazyVim's own file explorer in a sidebar, which is better in every way and is the one the rest of LazyVim's keybindings expect.
 
 ### Creating New Files
 
@@ -422,8 +631,13 @@ keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { noremap = true 
 | `:split filename` | Open file in a split window |
 | `:vsplit filename` | Open file in a vertical split |
 | `:tabnew filename` | Open file in a new tab |
-| `:next` | Switch to next file |
-| `:prev` | Switch to previous file |
+| `:bnext` | Switch to the next open file (buffer) |
+| `:bprev` | Switch to the previous open file (buffer) |
+| `:ls` | List everything you have open |
+
+In LazyVim, `Shift+L` and `Shift+H` do `:bnext` and `:bprev` without typing a command, and `<leader>,` opens a searchable list of open files.
+
+**A note on the word "buffer":** every file you open becomes a *buffer* - NeoVim's in-memory copy of it. A *window* is a viewport showing one buffer, and closing a window does not close the buffer. This is why `:bnext` is the command you want and not `:next`; `:next` walks the list of files you named on the command line when you launched NeoVim, which is almost never what a beginner means.
 
 ---
 
@@ -499,6 +713,49 @@ Add `c` to confirm each replacement:
 
 ---
 
+## Keeping LazyVim Updated
+
+### The right way
+
+Everything - LazyVim itself and every plugin it installed - updates from **inside NeoVim**, through the plugin manager:
+
+```
+:Lazy update
+```
+
+That is the whole answer. Run it every week or two.
+
+Other useful plugin-manager commands:
+
+| Command | What it does |
+|---------|--------------|
+| `:Lazy` | Open the plugin manager UI (`?` for help, `q` to close) |
+| `:Lazy update` | Update LazyVim and all plugins |
+| `:Lazy sync` | Install missing, update existing, remove leftovers |
+| `:Lazy health` | Check the plugin manager itself |
+| `:LazyHealth` | Load every plugin and check that each one is working |
+| `:LazyExtras` | Browse and toggle LazyVim's optional language and tool packs |
+
+`<leader>l` opens the same UI without typing anything.
+
+### ⚠️ Never update by pulling the starter repository
+
+You may see advice like `cd ~/.config/nvim && git pull origin main`. **Do not do this.**
+
+The LazyVim starter is a **template**, not an upstream you track. `~/.config/nvim` is *your* configuration - your options, your keymaps, your plugin choices. Pulling template changes on top of it fights your own edits and can drop you into merge conflicts inside the very config your editor needs in order to start.
+
+This is why [Installing LazyVim](#installing-lazyvim) tells you to `rm -rf ~/.config/nvim/.git`. With no git remote there is nothing to pull, and the trap closes itself.
+
+### Updating NeoVim itself
+
+NeoVim is separate from LazyVim and updates through however you installed it: `brew upgrade neovim`, `sudo pacman -Syu neovim`, or downloading a fresh tarball. After a NeoVim upgrade it is worth running `:LazyHealth` once.
+
+### Version-locking, if you want it
+
+`:Lazy update` writes a `lazy-lock.json` file in `~/.config/nvim` recording the exact version of every plugin. Keep that file in your own git repository and you can reproduce your setup on another machine with `:Lazy restore`, or roll back an update that broke something.
+
+---
+
 ## Essential Keybindings Reference
 
 ### Quick Reference
@@ -542,7 +799,9 @@ Add `c` to confirm each replacement:
 
 3. **Practice the basics daily.** Opening files, navigating, editing, saving. Do this for a week before learning advanced features.
 
-4. **Use LazyVim's features gradually.** You get fuzzy search (`Ctrl+p`), file browser, and many plugins for free. Explore them as you get comfortable.
+4. **Use LazyVim's features gradually.** You get fuzzy file search (`<leader>ff`), project-wide text search (`<leader>/`), a file explorer (`<leader>e`), and dozens of plugins for free. Explore them as you get comfortable.
+
+   The fastest way to discover them: press Space and wait a moment. A menu of everything available appears.
 
 5. **Keep this guide handy.** Bookmark it and refer back when you forget a command.
 
@@ -567,14 +826,39 @@ Add `c` to confirm each replacement:
 - Type `:w` to save. You'll see "written to filename" at the bottom.
 
 **"Plugins won't install"**
-- Close NeoVim and run `nvim` again. LazyVim installs plugins on startup.
+- Open the plugin manager with `:Lazy` and look at what it says. Press `?` inside it for help, `q` to close.
+- Run `:Lazy sync` to install anything missing, update the rest, and remove leftovers.
+- Then run `:LazyHealth` and `:checkhealth` and read the red `ERROR` lines.
+- Plugin installation needs `git` 2.19 or newer. Check with `git --version`.
+
+**"LazyVim won't start, or throws errors immediately"**
+- Almost always an out-of-date NeoVim. Run `nvim --version`; you need 0.11.2 or newer. See [Before You Install](#before-you-install).
+
+**"My interface is full of boxes and question marks"**
+- Your terminal is not using a Nerd Font. Install one and set it as your terminal's font. See [Before You Install](#before-you-install).
+
+**"Ctrl+b doesn't page up any more"**
+- You are inside Herdr or tmux, and it claimed `Ctrl+b` as its prefix key. Use `Ctrl+u` instead, or change the multiplexer's prefix.
+
+**"Which key was that again?"**
+- Press Space and wait. LazyVim pops up every command that starts with Space. Do the same after `g`, `z`, or `]`.
+- `<leader>sk` opens a searchable list of every keybinding you have.
 
 ---
 
 ## Next Steps
 
-- Practice basic navigation and editing for a week
-- Learn search and replace
-- Explore LazyVim's file browser and search features
+- Practice basic navigation and editing for a week before adding anything new
+- Learn search and replace properly
+- Press Space and browse the menu until the commands you use most stop needing a lookup
 - Read `:help` pages for topics that interest you
 - Customize your keybindings and settings
+
+**Official documentation:**
+
+- LazyVim: <https://lazyvim.org>
+- LazyVim keymaps, the authoritative list: <https://lazyvim.org/keymaps>
+- NeoVim: <https://neovim.io/doc/>
+- Inside the editor: `:help`, and `:help user-manual` for the guided tour
+
+If you also use Herdr, see the [Herdr guide](herdr-guide.md) - and read its note about the `Ctrl+b` collision before it confuses you.
