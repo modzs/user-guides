@@ -37,9 +37,8 @@ If you just want to read and use these guides, clone the repository to your loca
 
 2. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/user-guides.git
+   git clone https://github.com/modzs/user-guides.git
    ```
-   Replace `yourusername` with the actual GitHub username that owns this repository.
 
 3. **Navigate into the repository:**
    ```bash
@@ -83,7 +82,7 @@ Forking creates a complete copy of this repository under your GitHub account. Yo
    - Verify your email
 
 2. **Fork the repository on GitHub:**
-   - Navigate to the original repository: `https://github.com/yourusername/user-guides`
+   - Navigate to the original repository: `https://github.com/modzs/user-guides`
    - Click the **Fork** button in the top-right corner
    - Select where to fork it (usually your personal account)
    - GitHub creates a copy under your account at `https://github.com/your-username/user-guides`
@@ -102,9 +101,9 @@ Forking creates a complete copy of this repository under your GitHub account. Yo
 5. **Add the original repository as "upstream":**
    This lets you pull updates from the original repository while keeping your own changes:
    ```bash
-   git remote add upstream https://github.com/yourusername/user-guides.git
+   git remote add upstream https://github.com/modzs/user-guides.git
    ```
-   Replace `yourusername` with the original repository owner's username.
+   Replace `modzs` with the original repository owner's username.
 
 6. **Verify your remotes:**
    ```bash
@@ -114,8 +113,8 @@ Forking creates a complete copy of this repository under your GitHub account. Yo
    ```
    origin    https://github.com/your-username/user-guides.git (fetch)
    origin    https://github.com/your-username/user-guides.git (push)
-   upstream  https://github.com/yourusername/user-guides.git (fetch)
-   upstream  https://github.com/yourusername/user-guides.git (push)
+   upstream  https://github.com/modzs/user-guides.git (fetch)
+   upstream  https://github.com/modzs/user-guides.git (push)
    ```
 
 ### Making Changes to Your Fork
@@ -214,7 +213,7 @@ If you've made improvements you think others should benefit from:
 
 ```bash
 # Clone the original repository (read-only)
-git clone https://github.com/yourusername/user-guides.git
+git clone https://github.com/modzs/user-guides.git
 
 # Clone your fork (your copy)
 git clone https://github.com/your-username/user-guides.git
