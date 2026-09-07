@@ -1380,15 +1380,18 @@ sudo crontab -e
 
 Substitute your own home directory for `/home/you`. Spell the path out rather than using
 `$HOME`: this entry belongs to root, so `$HOME` here is `/root`, not the account that holds
-the script.
+the script. The same applies *inside* `backup-jellyfin-ollama` - under this schedule `~` and
+`$HOME` are `/root` there too, so write `/home/you/.bashrc` and
+`/home/you/.local/bin/gpu-mode` in the `sudo tar` command rather than `~/.bashrc` and
+`~/.local/bin/gpu-mode`, or the nightly archive will quietly capture root's dotfiles instead
+of yours.
 
 Scheduling this from your own `crontab -e` does not work, and it fails silently. The script
 archives root-owned paths - `/etc/fstab`, `/etc/docker/daemon.json`,
 `/srv/appdata/jellyfin/config` - so it contains `sudo`. At 02:30 there is no terminal to
 read a password from, and sudo(8) documents that case: *"a terminal is required to read the
 password - sudo needs to read the password but there is no mechanism available for it to do
-so."* Your manual test succeeds because you are sitting at a terminal; the nightly run
-writes that error into the log file and no archive is created.
+so."* The nightly run writes that error into the log file and no archive is created.
 
 `crontab -e` under `sudo` edits root's crontab, because crontab(1) without `-u` "examines
 'your' crontab, i.e., the crontab of the person executing the command". A `sudo` inside the
@@ -1767,12 +1770,13 @@ ls -lh /mnt/backup/jellyfin-ollama/
 
 ```bash
 ls -lh /mnt/backup/jellyfin-ollama/
+sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep -E 'srv/compose|etc/fstab|home/'
 ```
 
-   Compare the newest file's timestamp against the time the job should have run. A scheduled
-   backup that fails does so silently, so this check is what turns a silent failure into a
-   loud one. Do it again whenever you change the schedule, the script, or the account it
-   runs as.
+   Compare the newest file's timestamp against the time the job should have run, and confirm
+   the listing shows the paths you meant to archive - a scheduled backup can fail silently,
+   and one written under the wrong account is the right size with the wrong contents. Do it
+   again whenever you change the schedule, the script, or the account it runs as.
 
 6. Once per quarter, test restoring a copied file or a disposable Compose file.
 

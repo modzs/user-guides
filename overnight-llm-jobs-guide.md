@@ -209,7 +209,7 @@ pid_file() {
 proc_starttime() {
   local pid="$1" stat rest
   stat="$(cat "/proc/$pid/stat" 2>/dev/null)" || return 1
-  rest="${stat#*) }"
+  rest="${stat##*) }"
   awk '{print $20}' <<<"$rest"
 }
 
@@ -801,9 +801,6 @@ After jobs finish, or after a server reboot:
 ```bash
 ai-job-cleanup
 ```
-
-Any job started before the start-time check existed has no recorded start time, so it is
-treated as finished and its record is cleaned up rather than being signalled.
 
 This removes only old PID tracking files whose processes are no longer running. It does not remove prompts or outputs.
 
