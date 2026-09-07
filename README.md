@@ -345,6 +345,7 @@ For questions or issues:
    - Herdr: <https://herdr.dev/docs/>
    - NeoVim: `:help` inside the editor, or <https://neovim.io/doc/>
    - LazyVim: <https://lazyvim.org>
+   - Server tools: the Home Server Guide links the official Docker, NVIDIA Container Toolkit, and Tailscale documentation at the steps that use them
 4. Open an issue on the GitHub repository
 
 ---
