@@ -155,9 +155,9 @@ Usage:
   llm-job run PROMPT_FILE [MODEL] [JOB_NAME]
   llm-job status [JOB_NAME]
   llm-job list
-  llm-job tail [JOB_NAME]
-  llm-job output [JOB_NAME]
-  llm-job error [JOB_NAME]
+  llm-job tail JOB_NAME
+  llm-job output JOB_NAME
+  llm-job error JOB_NAME
   llm-job stop JOB_NAME
   llm-job cleanup
   llm-job help
@@ -176,10 +176,10 @@ Commands:
 Examples:
   llm-job run ~/llm-jobs/prompts/overnight.txt
   llm-job run ~/llm-jobs/prompts/research.txt deepseek-r1:32b research-test
-  llm-job status research-test
-  llm-job tail research-test
-  llm-job output research-test
-  llm-job stop research-test
+  llm-job status research-test-YYYY-MM-DD-HHMMSS
+  llm-job tail research-test-YYYY-MM-DD-HHMMSS
+  llm-job output research-test-YYYY-MM-DD-HHMMSS
+  llm-job stop research-test-YYYY-MM-DD-HHMMSS
 USAGE
 }
 
@@ -983,7 +983,7 @@ Choose one of these policies:
 
 Do not back up `~/llm-jobs/running` because PID files are temporary and not useful after a reboot. Error/log files can be backed up only if they are useful for audit/troubleshooting.
 
-If you decide prompts and outputs should be backed up, edit the backup script:
+Back up the runner script itself, and the prompts and outputs too if you decide they are worth keeping, by editing the backup script:
 
 ```bash
 nvim ~/.local/bin/backup-jellyfin-ollama
@@ -992,6 +992,7 @@ nvim ~/.local/bin/backup-jellyfin-ollama
 Add these paths to the backup `tar` command:
 
 ```bash
+  /home/you/.local/bin/llm-job \
   /home/you/llm-jobs/prompts \
   /home/you/llm-jobs/output \
 ```
