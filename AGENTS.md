@@ -6,10 +6,11 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 
 Beginner guides for terminal tools, the agent workflows built on them, and self-hosted
 services, written for readers who have never used a modal editor, a terminal multiplexer,
-or a home server. Content files: `README.md`, `herdr-guide.md`,
-`neovim-lazyvim-guide.md`, `firstmate-guide.md`, `home-server-guide.md`,
-`overnight-llm-jobs-guide.md`, plus `LICENSE`. `README.md` indexes every guide under
-"Available Guides"; adding a guide means adding an entry there. No build, no tests, no CI.
+or a home server. Content files: `README.md`, `github-cli-guide.md`,
+`herdr-guide.md`, `neovim-lazyvim-guide.md`, `firstmate-guide.md`,
+`home-server-guide.md`, `overnight-llm-jobs-guide.md`, plus `LICENSE`. `README.md`
+indexes every guide under "Available Guides"; adding a guide means adding an entry
+there. No build, no tests, no CI.
 
 ## The rule that matters here
 
