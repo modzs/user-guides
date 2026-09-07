@@ -1,0 +1,4 @@
+# This repository is documentation only: no build, no tests, no CI workflows.
+# Without this declaration the no-mistakes pipeline waits for checks that never
+# register and eventually times out instead of passing.
+no_ci: true

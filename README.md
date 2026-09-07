@@ -13,108 +13,95 @@ A collection of comprehensive beginner guides for developer tools and terminal u
   - Common workflows for solo and team projects
   - GitHub CLI command reference and troubleshooting
 
-- **[NeoVim and LazyVim Guide](neovim-lazyvim-guide.md)** - Complete beginner's guide to NeoVim and LazyVim text editor
+- **[NeoVim and LazyVim Guide](neovim-lazyvim-guide.md)** - Getting started with the NeoVim text editor and the LazyVim configuration
+  - What to check and install *before* you start, including the version trap that stops most beginners
   - Installation on macOS, Ubuntu/Debian, and Arch/Omarchy Linux
-  - Understanding modes and navigation
-  - Basic editing and common tasks
-  - Settings and configuration
-  - Windows, splits, and workflows
+  - Modes, navigation, and everyday editing
+  - LazyVim's leader-key commands, splits, and code navigation
+  - Settings, configuration, and how to update it safely
 
-- **[Herdr Guide](herdr-guide.md)** - Complete beginner's guide to Herdr terminal multiplexer
-  - Installation on macOS, Ubuntu/Debian, and Arch/Omarchy Linux
-  - Sessions, windows, and panes
-  - Working with AI agents
-  - Workflow patterns
-  - Configuration and management
+- **[Herdr Guide](herdr-guide.md)** - Getting started with Herdr, a terminal workspace manager for AI coding agents
+  - Installation on Linux, macOS, and Windows
+  - Sessions, workspaces, tabs, and panes, and what each one is for
+  - The sidebar, the mouse, and the prefix key
+  - Git worktree workspaces
+  - Running, monitoring, and scripting AI coding agents
+  - Configuration, workflow patterns, and troubleshooting
+
+> **If you plan to read both:** `Ctrl+b` means two different things in these two tools - page-up in NeoVim, and the prefix key in Herdr. Inside a Herdr pane, Herdr wins. Both guides explain what to do about it; it catches everyone once.
 
 ## Getting Started
 
-### Option 1: Clone This Repository (Read-Only)
+Just want to read the guides? You do not need git, a GitHub account, or any of the material further down this page.
 
-If you just want to read and use these guides, clone the repository to your local machine.
+### Read them in your browser
 
-#### Prerequisites
-- Git installed on your system
-- Basic familiarity with the terminal
+Click either guide in the list above. GitHub renders them, and that is the whole process.
 
-#### Step-by-Step Instructions
+### Read them offline
 
-1. **Open your terminal** and navigate to where you want to store these guides:
-   ```bash
-   cd ~  # or any directory you prefer
-   ```
+If you would rather have a local copy:
 
-2. **Clone the repository:**
-   ```bash
-   git clone https://github.com/modzs/user-guides.git
-   ```
+```bash
+git clone https://github.com/modzs/user-guides.git
+cd user-guides
+```
 
-3. **Navigate into the repository:**
-   ```bash
-   cd user-guides
-   ```
+Then open whichever guide you want:
 
-4. **View the guides:**
-   - Open any `.md` file in your text editor or terminal:
-   ```bash
-   # View with terminal pager
-   less neovim-lazyvim-guide.md
-   
-   # Or open in your default editor
-   open neovim-lazyvim-guide.md  # macOS
-   xdg-open neovim-lazyvim-guide.md  # Linux
-   ```
+```bash
+less neovim-lazyvim-guide.md     # read in the terminal
+xdg-open herdr-guide.md          # open in your default app (Linux)
+open herdr-guide.md              # open in your default app (macOS)
+```
 
-5. **Keep up with updates:**
-   If the guides are updated in the repository, pull the latest changes:
-   ```bash
-   git pull origin master
-   ```
+To pick up later changes:
 
-### Option 2: Fork and Clone (Add Your Own Customizations)
+```bash
+git pull origin master
+```
 
-If you want to add environment-specific details, create your own version, or contribute improvements, fork this repository first.
+That is everything most readers need. The rest of this page is for people who want to keep their own customized copy or send improvements back.
 
-#### What is Forking?
+---
 
-Forking creates a complete copy of this repository under your GitHub account. You can make changes to your copy without affecting the original. This is useful if you want to:
+## Contributing and Customizing
+
+This section is entirely optional. Skip it unless you want to change these guides or add your own.
+
+### Why fork?
+
+Forking creates your own copy of this repository under your GitHub account. You can change it freely without affecting the original. It is worth doing if you want to:
+
 - Add notes specific to your setup
-- Customize guides for your team
+- Customize the guides for your team
 - Add sections for other tools you use
 - Contribute improvements back to the original project
 
-#### Step-by-Step Fork and Clone Instructions
+### Fork and clone
 
-1. **Create a GitHub account** (if you don't have one)
-   - Go to [github.com](https://github.com)
-   - Sign up for a free account
-   - Verify your email
+1. **Create a GitHub account** if you do not have one, at [github.com](https://github.com).
 
-2. **Fork the repository on GitHub:**
-   - Navigate to the original repository: `https://github.com/modzs/user-guides`
-   - Click the **Fork** button in the top-right corner
-   - Select where to fork it (usually your personal account)
-   - GitHub creates a copy under your account at `https://github.com/your-username/user-guides`
+2. **Fork the repository:**
+   - Go to <https://github.com/modzs/user-guides>
+   - Click the **Fork** button in the top right
+   - Choose where to fork it, usually your personal account
+   - GitHub creates your copy at `https://github.com/your-username/user-guides`
 
-3. **Clone your fork to your local machine:**
+3. **Clone your fork:**
    ```bash
    git clone https://github.com/your-username/user-guides.git
+   cd user-guides
    ```
    Replace `your-username` with your actual GitHub username.
 
-4. **Navigate into your local copy:**
-   ```bash
-   cd user-guides
-   ```
-
-5. **Add the original repository as "upstream":**
-   This lets you pull updates from the original repository while keeping your own changes:
+4. **Add the original repository as `upstream`:**
+   This lets you pull in later changes from the original while keeping your own:
    ```bash
    git remote add upstream https://github.com/modzs/user-guides.git
    ```
-   Replace `modzs` with the original repository owner's username.
 
-6. **Verify your remotes:**
+5. **Check your remotes:**
    ```bash
    git remote -v
    ```
@@ -126,23 +113,18 @@ Forking creates a complete copy of this repository under your GitHub account. Yo
    upstream  https://github.com/modzs/user-guides.git (push)
    ```
 
-### Making Changes to Your Fork
+### Making changes
 
-#### Adding Environment-Specific Details
-
-1. **Create a branch for your changes:**
+1. **Create a branch:**
    ```bash
    git checkout -b my-customizations
    ```
 
-2. **Edit the guides:**
-   - Open any guide file in your text editor
-   - Add your notes, customizations, or environment-specific details
-   - Save the file
+2. **Edit the guides** in your text editor and save.
 
-3. **Stage and commit your changes:**
+3. **Commit:**
    ```bash
-   git add neovim-lazyvim-guide.md  # or whichever file you edited
+   git add neovim-lazyvim-guide.md      # or whichever file you edited
    git commit -m "Add custom setup notes for my environment"
    ```
 
@@ -151,70 +133,57 @@ Forking creates a complete copy of this repository under your GitHub account. Yo
    git push origin my-customizations
    ```
 
-5. **Your fork now has your customizations** - you can access them anytime by cloning from your fork instead of the original.
+#### Example: adding your own notes
 
-#### Example: Adding Custom Notes
+To add a "My Setup" section to the NeoVim guide, open `neovim-lazyvim-guide.md`, scroll to the end, and add:
 
-If you want to add a "My Setup" section to the NeoVim guide:
+```markdown
+## My Custom Setup
 
-1. Open `neovim-lazyvim-guide.md` in your editor
-2. Scroll to the end
-3. Add a new section:
-   ```markdown
-   ## My Custom Setup
+### My Environment
+- OS: Ubuntu 22.04
+- Shell: zsh
+- Custom plugins: ...
+```
 
-   ### My Environment
-   - OS: Ubuntu 22.04
-   - Shell: zsh
-   - Custom plugins: ...
-   ```
+Then save and commit as above.
 
-4. Save and commit:
-   ```bash
-   git add neovim-lazyvim-guide.md
-   git commit -m "Add my custom NeoVim configuration notes"
-   git push origin my-customizations
-   ```
+### Pulling in updates from the original
 
-### Pulling Updates from the Original Repository
+```bash
+git fetch upstream
+git checkout master
+git merge upstream/master
+git push origin master
+```
 
-If the original repository (upstream) receives updates and you want to incorporate them:
+### Sending your improvements back
 
-1. **Fetch updates from upstream:**
-   ```bash
-   git fetch upstream
-   ```
+If you have made a change others would benefit from, open a pull request.
 
-2. **Switch to your main branch:**
-   ```bash
-   git checkout master
-   ```
+1. **Push your branch to your fork** as shown above.
 
-3. **Merge upstream changes:**
-   ```bash
-   git merge upstream/master
-   ```
-
-4. **Push the merged changes to your fork:**
-   ```bash
-   git push origin master
-   ```
-
-### Contributing Back to the Original Repository
-
-If you've made improvements you think others should benefit from:
-
-1. **Commit and push your changes to your fork** (as shown above)
-
-2. **Create a Pull Request:**
+2. **Start the pull request:**
    - Go to your fork on GitHub: `https://github.com/your-username/user-guides`
-   - Click **Pull Requests** tab
-   - Click **New Pull Request**
-   - Click **Create Pull Request**
-   - Write a description of your changes
-   - Click **Create Pull Request**
+   - Click the **Pull requests** tab, then **New pull request**
 
-3. **The repository maintainer will review your changes** and either merge them or provide feedback.
+3. **Point it at the right places.** GitHub shows a "Comparing changes" page with two dropdowns. Check both:
+   - **base repository:** `modzs/user-guides`, **base:** `master` - where your change is going
+   - **head repository:** `your-username/user-guides`, **compare:** `my-customizations` - where it is coming from
+
+   If you only see one repository and no way to pick another, click the **compare across forks** link. GitHub hides the base/head repository dropdowns until you do, and this is the step people miss.
+
+4. **Review the diff** shown underneath. It should contain your changes and nothing else.
+
+5. **Click "Create pull request".** This opens a form; it does not submit anything yet.
+
+6. **Write a title and description** explaining what you changed and why.
+
+7. **Click "Create pull request" again** to actually submit it.
+
+The repository maintainer will review your changes and either merge them or leave feedback.
+
+---
 
 ## Common Git Commands Reference
 
@@ -331,25 +300,30 @@ This shows both your fork (origin) and the original repository (upstream).
 
 ## Guide Maintenance
 
-These guides are maintained and updated regularly. To stay current:
+These guides are updated when the tools they cover change or when someone reports a problem. There is no release schedule, so check the [commit history](https://github.com/modzs/user-guides/commits/master) if you want to know how current a guide is.
 
-- **Check for updates:** `git fetch upstream` (if forked) or `git pull origin` (if cloned)
-- **Report issues:** Open an issue on GitHub
+Both guides also state which version of the tool they were checked against. **Where a guide and your own machine disagree, believe your machine** - `herdr --help` and `nvim --version` are the authorities, not this repository.
+
+- **Check for updates:** `git pull origin master` (if cloned) or `git fetch upstream` (if forked)
+- **Report a problem:** Open an issue on GitHub. Corrections are especially welcome.
 - **Suggest improvements:** Fork and submit a pull request
-- **Share your customizations:** Keep your fork up-to-date and share the link with your team
 
 ## License
 
-These guides are provided as-is for educational purposes. Feel free to use, modify, and share.
+These guides are MIT licensed - see [LICENSE](LICENSE). They are provided as-is for
+educational purposes, so feel free to use, modify, and share them.
 
 ## Support
 
 For questions or issues:
-1. Check the **Troubleshooting** section in each guide
-2. Review this README's troubleshooting section
-3. Open an issue on the GitHub repository
-4. Check the guides' FAQ or ask in the repository discussions
+1. Check the **Troubleshooting** section in the relevant guide
+2. Review this README's troubleshooting section, which covers git and GitHub problems
+3. For a problem with the tool itself rather than the guide, check that tool's own documentation:
+   - Herdr: <https://herdr.dev/docs/>
+   - NeoVim: `:help` inside the editor, or <https://neovim.io/doc/>
+   - LazyVim: <https://lazyvim.org>
+4. Open an issue on the GitHub repository
 
 ---
 
-**Happy learning!** Start with the guide you need most, and refer back to this README whenever you need help with git or GitHub.
+**Happy learning!** Start with the guide you need most. Come back to this README when you want help with git or GitHub.
