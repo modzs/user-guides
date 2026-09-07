@@ -829,7 +829,7 @@ The same file is at <https://raw.githubusercontent.com/herdrdev/herdr/master/ski
 
 ## Driving Herdr from Scripts
 
-Every `herdr` subcommand under `workspace`, `tab`, `pane`, `agent`, and `worktree` talks to the running server and prints JSON. That makes Herdr scriptable.
+Most `herdr` subcommands under `workspace`, `tab`, `pane`, `agent`, and `worktree` talk to the running server and print a JSON response. That is what makes Herdr scriptable. The exceptions are the commands that hand you terminal content instead: `pane read` and `agent read` print raw terminal text, `agent explain` prints a human-readable report unless you add `--json`, and `agent attach` attaches your terminal rather than returning a response, so none of those four are `jq` input.
 
 **Capture IDs from responses. Never guess them.**
 
