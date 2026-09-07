@@ -238,6 +238,42 @@ unauthenticated service that will happily run any prompt anyone sends it. If you
 want remote access, put something in front of it that authenticates, rather than widening
 this binding.
 
+### The `ollama` and `ai-*` commands
+
+Ollama here runs only as a Docker container. There is no `ollama` binary on the host, so a
+bare `ollama ...` command fails with `ollama: command not found` until you define a wrapper
+for it. The underlying form that always works is the container form:
+
+```bash
+docker exec ollama ollama list
+docker exec -i ollama ollama run MODEL --hidethinking
+```
+
+In the same way, `ai`, `ai-fast`, `ai-code`, `ai-pro`, `ai-code-pro`, `ai-models` and
+`ai-status` are personal shell helpers of the same kind as `gpu-mode`. They are not commands
+that exist once you have followed this guide; the guide shows you what they are for, and you
+write them.
+
+One wrapper function makes every `ollama ...` command in the rest of this guide work as
+written. Add it to `~/.bashrc`:
+
+```bash
+ollama() {
+  if [ -t 0 ]; then
+    docker exec -it ollama ollama "$@"
+  else
+    docker exec -i ollama ollama "$@"
+  fi
+}
+```
+
+`-t` allocates a pseudo-TTY, which an interactive chat needs; the non-terminal branch is what
+lets a prompt be piped in instead.
+
+The `ai-*` helpers are then one-liners over that wrapper. The `ai-strong` function in
+[Install `qwen3:14b`](#install-qwen314b) is the shape to copy - substitute the model and the
+name you want.
+
 ### Jellyfin
 
 Run Jellyfin in Docker as a container named `jellyfin`, with:
@@ -295,6 +331,9 @@ public internet alongside it.
 ## Everyday use
 
 ### Use local AI
+
+The `ai-*` names below and the bare `ollama` command are helpers you define yourself; see
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands) before running them.
 
 Reserve the GPU for AI when you expect substantial LLM use:
 
@@ -370,6 +409,10 @@ Press `Ctrl+C` to stop the live display.
 
 ### Ollama aliases
 
+None of these exist until you write them, and neither does `ollama` itself - see
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands) for why, and for the one
+wrapper function that makes the rest of this table work.
+
 | Command | Model/action | Best use |
 |---|---|---|
 | `ai-fast` | `qwen3.5:4b` | Fast simple questions, summaries, quick explanations, and small scripts. |
@@ -379,7 +422,7 @@ Press `Ctrl+C` to stop the live display.
 | `ai-pro` | `gemma3:12b` | Stronger analysis, careful writing, and image-aware requests. |
 | `ai-models` | Lists downloaded Ollama models. | Review installed model inventory. |
 | `ai-status` | Shows loaded models, GPU state, and RAM use. | Check model placement and resource use. |
-| `ollama` | Generic Ollama wrapper. | Use `ollama list`, `ollama ps`, `ollama pull MODEL`, and `ollama rm MODEL`. |
+| `ollama` | Your own wrapper around `docker exec ... ollama` - see [The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands). | Use `ollama list`, `ollama ps`, `ollama pull MODEL`, and `ollama rm MODEL`. |
 
 The model launch commands use `--hidethinking`. Ollama documents that flag as "Hide thinking
 output (if provided)" - it suppresses the reasoning text a thinking model emits, so what
@@ -416,6 +459,10 @@ docker compose up -d
 ```
 
 ## Ollama model management
+
+Every `ollama ...` and `ai-*` command in this chapter assumes the wrapper and helpers from
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands). Without them, use the
+container form directly - `docker exec ollama ollama pull MODEL`, and so on.
 
 ### Current recommended models
 
@@ -1330,6 +1377,9 @@ Suggested schedule after manual testing:
 crontab -e
 ```
 
+`crontab` does not expand `~` or `$HOME`, so this line needs real absolute paths. Get yours
+with `echo "$HOME"` and substitute it for `/home/you` in both places:
+
 ```cron
 30 2 * * * /home/you/.local/bin/backup-jellyfin-ollama >> /home/you/backup-jellyfin-ollama.log 2>&1
 ```
@@ -1458,7 +1508,7 @@ docker compose logs --tail=100 ollama
 ai-models
 ```
 
-If models are missing, re-download only wanted models with `ollama pull MODEL`.
+If models are missing, re-download only wanted models with `docker exec ollama ollama pull MODEL`.
 
 ### Future service
 
@@ -1540,9 +1590,14 @@ sudo mkdir -p /etc/docker /srv/docker /srv/compose /srv/appdata /srv/models
 cd ~/restore-check
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz etc/docker/daemon.json
 sudo cp ~/restore-check/etc/docker/daemon.json /etc/docker/daemon.json
-sudo systemctl enable --now containerd.service docker.service
+sudo systemctl enable containerd.service docker.service
+sudo systemctl restart docker
 sudo usermod -aG docker "$USER"
 ```
+
+Installing Docker already started the daemon, so it is running with the default data root
+at this point. The restart is what makes it re-read the `daemon.json` you just restored;
+without it the check below still reports `/var/lib/docker`.
 
 Log out/back in, then check:
 
@@ -1589,25 +1644,46 @@ Install/authenticate Tailscale normally. Do not copy Tailscale machine-state fil
 
 Restore service configuration and aliases:
 
+The paths *inside* the archive carry whatever account name the old machine used, which this
+guide cannot know and which need not match the account you just created. List them and read
+the name off the `home/` entries first:
+
 ```bash
+tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep '^home/'
+```
+
+Use that name wherever `OLDUSER` appears below. Everything outside the archive uses `$HOME`,
+which is already correct for the account you are logged in as:
+
+```bash
+OLDUSER=the-name-you-just-read
+
 cd /
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
   srv/compose \
   srv/appdata/jellyfin/config \
-  home/you/.bashrc \
-  home/you/.local/bin/gpu-mode
+  "home/$OLDUSER/.bashrc" \
+  "home/$OLDUSER/.local/bin/gpu-mode"
+
+sudo cp "/home/$OLDUSER/.bashrc" "$HOME/.bashrc"
+sudo mkdir -p "$HOME/.local/bin"
+sudo cp "/home/$OLDUSER/.local/bin/gpu-mode" "$HOME/.local/bin/gpu-mode"
 
 sudo chown -R "$USER:$USER" /srv/compose
 sudo chown -R "$USER:$USER" /srv/appdata/jellyfin/config
-sudo chown "$USER:$USER" /home/you/.bashrc
-sudo chown -R "$USER:$USER" /home/you/.local
-sudo chmod 0755 /home/you/.local/bin/gpu-mode
+sudo chown "$USER:$USER" "$HOME/.bashrc"
+sudo chown -R "$USER:$USER" "$HOME/.local"
+sudo chmod 0755 "$HOME/.local/bin/gpu-mode"
 ```
+
+If the old account name happens to match the account you are logged in as, the extracted
+files are already in the right place: skip the three lines above that recreate them, because
+`cp` refuses a copy onto the same file with `are the same file` and exits non-zero.
 
 Reload commands:
 
 ```bash
-source /home/you/.bashrc
+source "$HOME/.bashrc"
 hash -r
 ```
 
@@ -1806,6 +1882,10 @@ The GPU request should not be `null`. In Jellyfin, ensure NVIDIA NVENC is select
 
 ### Ollama is slow
 
+`ai-status` and `ollama` are the helpers from
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands); without them, read
+`ollama ps` as `docker exec ollama ollama ps`.
+
 ```bash
 gpu-mode ai
 ai-status
@@ -1826,7 +1906,8 @@ du -sh /srv/models/ollama
 du -sh /srv/appdata/jellyfin/*
 ```
 
-Safe first actions:
+Safe first actions (`ollama` here is the wrapper from
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands)):
 
 ```bash
 ollama rm MODEL-NAME
@@ -1874,6 +1955,10 @@ Restore missing scripts or shell configuration from backup if needed.
 11. Keep this guide and current backup information outside the OS drive too.
 
 ## Quick reference
+
+The `gpu-mode`, `backup-jellyfin-ollama`, `ollama` and `ai-*` entries below are helpers you
+write yourself - see [Important service files](#important-service-files) and
+[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands).
 
 ```bash
 # Server state

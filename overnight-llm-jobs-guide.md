@@ -101,6 +101,12 @@ ollama pull deepseek-r1:32b
 ollama list
 ```
 
+A bare `ollama` here means the wrapper function defined in [The `ollama` and `ai-*`
+commands](home-server-guide.md#the-ollama-and-ai--commands) in the Home Server Guide; Ollama
+itself runs only in the container. Without that wrapper, use the container form directly -
+`docker exec ollama ollama pull deepseek-r1:32b` and `docker exec ollama ollama list`, which
+is the form the runner script below uses throughout.
+
 ## Directory layout
 
 Store prompt files and results under your own home directory. This guide writes it as
@@ -183,8 +189,6 @@ init_dirs() {
 
 safe_name() {
   local value="$1"
-  value="${value##*/}"
-  value="${value%.*}"
   value="${value// /-}"
   value="${value//[^a-zA-Z0-9._-]/-}"
   printf '%s' "$value"
@@ -251,7 +255,12 @@ run_job() {
   fi
 
   local base_name job_name stamp
-  base_name="$(safe_name "${supplied_name:-$prompt_file}")"
+  if [[ -n "$supplied_name" ]]; then
+    base_name="$(safe_name "$supplied_name")"
+  else
+    base_name="${prompt_file##*/}"
+    base_name="$(safe_name "${base_name%.*}")"
+  fi
   stamp="$(date +%F-%H%M%S)"
   job_name="${base_name}-${stamp}"
 
@@ -279,7 +288,7 @@ run_job() {
 
   if ! docker exec ollama ollama list | awk 'NR>1 {print $1}' | grep -Fxq "$model_tagged"; then
     printf 'Error: model "%s" is not installed.\n' "$model" >&2
-    printf 'Install it with: ollama pull %s\n' "$model" >&2
+    printf 'Install it with: docker exec ollama ollama pull %s\n' "$model" >&2
     exit 1
   fi
 
@@ -407,7 +416,9 @@ stop_job() {
   fi
 
   rm -f "$pid_path"
-  printf 'Stopped. Partial output, if any, remains in: %s\n' "$OUTPUT_FILE"
+  printf 'Stopped the local client. The model may still be generating inside the\n'
+  printf 'container - check with: docker exec ollama ollama ps\n'
+  printf 'Output written so far, if any, is in: %s\n' "$OUTPUT_FILE"
 }
 
 cleanup() {
@@ -529,6 +540,8 @@ Add:
 
 ```bash
 # Large reasoning model: DeepSeek-R1 32B.
+# `ollama` is the wrapper function from the Home Server Guide; without it, use
+# `docker exec -it ollama ollama run ...` here instead.
 ai-reason() {
   ollama run deepseek-r1:32b --hidethinking "$@"
 }
@@ -606,7 +619,7 @@ Each should report `function`.
 | `ai-job-tail JOB` | Runs `llm-job tail JOB`. | Watch a running job's final-answer output. Press `Ctrl+C` to stop watching. |
 | `ai-job-output JOB` | Runs `llm-job output JOB`. | Open completed or partial output in Neovim. |
 | `ai-job-error JOB` | Runs `llm-job error JOB`. | Open standard errors in Neovim. |
-| `ai-job-stop JOB` | Runs `llm-job stop JOB`. | Stop a running job; partial output remains saved. |
+| `ai-job-stop JOB` | Runs `llm-job stop JOB`. | Stop a job's local client; output written so far remains saved. See [`stop` stops the client, not necessarily the model](#stop-stops-the-client-not-necessarily-the-model). |
 | `ai-job-cleanup` | Runs `llm-job cleanup`. | Remove stale job PID records after a job ends or the server reboots. |
 | `ai-monitor` | Runs `gpu-mode status`. | One-time GPU/RAM/service/disk snapshot. |
 | `ai-watch` | Runs `gpu-mode watch`. | Live GPU/RAM/service/disk monitoring during a long job. |
@@ -748,7 +761,10 @@ ai-job-error project-review-YYYY-MM-DD-HHMMSS
 ai-job-stop project-review-YYYY-MM-DD-HHMMSS
 ```
 
-The script keeps partial final-answer output and the error log. It does not delete your prompt file.
+The script keeps whatever final-answer output and error log were written, and it does not
+delete your prompt file. It stops the local client rather than the model itself - read
+[`stop` stops the client, not necessarily the
+model](#stop-stops-the-client-not-necessarily-the-model) before starting a replacement job.
 
 ### 8. Remove stale job records
 
@@ -805,6 +821,31 @@ final answer appears - that is normal for a reasoning model and not a sign the j
 hung. The separate `--think` flag is what actually controls thinking mode on models that
 support it.
 
+### `stop` stops the client, not necessarily the model
+
+`llm-job stop` kills the host-side `docker exec` client. Docker does not signal a process
+inside a container when its exec client goes away, so the model can keep generating and keep
+holding VRAM after the command reports success. The job disappears from `llm-job list` while
+the work behind it may still be running.
+
+That matters because starting a replacement job right after a "stop" can put two large models
+on one GPU at once - exactly the situation [One large job at a
+time](#one-large-job-at-a-time) warns about.
+
+Check what is actually loaded, and unload it if needed:
+
+```bash
+docker exec ollama ollama ps
+docker exec ollama ollama stop deepseek-r1:32b
+```
+
+`ollama ps` lists running models. `ollama stop MODEL` takes exactly one model name and is
+documented as stopping a running model: it sets that model's keep-alive to zero and unloads
+it, and reports `couldn't find model "<name>" to stop` if the model is not loaded. Whether it
+also aborts a generation that is already in flight has **not** been verified here against a
+running server, so do not assume it does. The check that matters is `docker exec ollama
+ollama ps` showing nothing before you start a replacement job.
+
 ### Background job versus reboot
 
 `nohup` keeps a job running after an SSH disconnect. It does not survive a server reboot, Docker restart, Ollama container restart, or power loss. If the server reboots, the job ends and partial output may remain.
@@ -835,7 +876,7 @@ Then retry the job.
 ### The job says the model is not installed
 
 ```bash
-ollama pull deepseek-r1:32b
+docker exec ollama ollama pull deepseek-r1:32b
 ```
 
 Then retry.
