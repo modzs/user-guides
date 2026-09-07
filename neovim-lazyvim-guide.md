@@ -4,7 +4,7 @@ A complete guide to getting started with NeoVim and LazyVim, from installation t
 
 **Platform Support:** This guide covers macOS, Ubuntu/Debian Linux, and Arch/Omarchy Linux. The core features are identical across all platforms - only installation methods differ.
 
-**Version note:** LazyVim's requirements were checked against the official LazyVim documentation at <https://lazyvim.org>. LazyVim moves, so if `:checkhealth` on your machine disagrees with this page, your machine is right.
+**Version note:** Everything in this guide was checked against **NeoVim 0.12.5** and **LazyVim 16.0.0**, plus the official LazyVim documentation at <https://lazyvim.org>. LazyVim moves, so if `:checkhealth` on your machine disagrees with this page, your machine is right.
 
 ## Table of Contents
 1. [What are NeoVim and LazyVim?](#what-are-neovim-and-lazyvim)
@@ -53,7 +53,7 @@ Check what you have:
 nvim --version
 ```
 
-The first two lines tell you everything:
+The first three lines tell you everything:
 
 ```
 NVIM v0.12.5
@@ -399,7 +399,8 @@ In Normal Mode:
 | `yy` | Copy the current line |
 | `y$` | Copy from cursor to end of line |
 | `y0` | Copy from start of line to cursor |
-| `yw` | Copy the current word |
+| `yw` | Copy from the cursor to the start of the next word |
+| `yiw` | Copy the whole word the cursor is in |
 
 **With visual selection:**
 1. Press `v` to enter Visual Mode
@@ -424,7 +425,8 @@ In Normal Mode:
 | `dd` | Delete the current line |
 | `d$` | Delete from cursor to end of line |
 | `d0` | Delete from start of line to cursor |
-| `dw` | Delete the current word |
+| `dw` | Delete from the cursor to the start of the next word |
+| `diw` | Delete the whole word the cursor is in |
 | `x` | Delete the character under the cursor |
 | `X` | Delete the character before the cursor |
 
@@ -459,8 +461,8 @@ You can press `u` multiple times to undo multiple changes.
 |---------|--------|
 | `>>` | Indent the current line (add spaces) |
 | `<<` | Unindent the current line (remove spaces) |
-| `>}` | Indent the current paragraph |
-| `<}` | Unindent the current paragraph |
+| `>}` | Indent from the cursor line to the end of the paragraph |
+| `<}` | Unindent from the cursor line to the end of the paragraph |
 
 **With visual selection:**
 1. Press `v` to select text
@@ -583,8 +585,8 @@ Edit `~/.config/nvim/lua/config/keymaps.lua`:
 ```lua
 -- Format: vim.keymap.set(mode, keys, action, options)
 
--- Save with Ctrl+s from Normal, Insert, and Visual mode
-vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+-- Save every open file with <leader>W, from Normal and Visual mode
+vim.keymap.set({ "n", "v" }, "<leader>W", "<cmd>wall<cr>", { desc = "Save all files" })
 
 -- Clear search highlighting with <leader>h
 vim.keymap.set("n", "<leader>h", "<cmd>nohlsearch<cr>", { desc = "Clear highlights" })
@@ -774,9 +776,11 @@ NeoVim is separate from LazyVim and updates through however you installed it: `b
 | Append after cursor | `a` |
 | New line below | `o` |
 | Delete line | `dd` |
-| Delete word | `dw` |
+| Delete to start of next word | `dw` |
+| Delete the whole word under the cursor | `diw` |
 | Copy line | `yy` |
-| Copy word | `yw` |
+| Copy to start of next word | `yw` |
+| Copy the whole word under the cursor | `yiw` |
 | Paste after cursor | `p` |
 | Paste before cursor | `P` |
 | Undo | `u` |
