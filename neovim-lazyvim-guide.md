@@ -65,7 +65,7 @@ Version `0.12.5`, and `LuaJIT` on the third line. That machine is fine.
 
 ### ⚠️ Your distribution's package is probably too old
 
-This is the trap. `sudo apt-get install neovim` is the obvious first thing to try, and on every current Debian and Ubuntu release it installs a NeoVim that LazyVim will not run:
+This is the trap. `sudo apt-get install neovim` is the obvious first thing to try, and on Debian and on every Ubuntu older than 26.04 it installs a NeoVim that LazyVim will not run:
 
 | Release | NeoVim in the default repos | Enough for LazyVim? |
 |---------|-----------------------------|---------------------|
@@ -73,10 +73,9 @@ This is the trap. `sudo apt-get install neovim` is the obvious first thing to tr
 | Debian 13 (trixie) | 0.10.4 | No |
 | Ubuntu 22.04 (jammy) | 0.6.1 | No |
 | Ubuntu 24.04 (noble) | 0.9.5 | No |
-| Ubuntu 25.04 (plucky) | 0.9.5 | No |
-| Ubuntu 25.10 (questing) | 0.10.4 | No |
+| Ubuntu 26.04 (resolute) | 0.11.6 | **Yes** |
 
-Arch and Omarchy are fine - `pacman` tracks upstream closely. Homebrew is fine. On Debian and Ubuntu, use the official binary instead, which the next section walks through.
+Ubuntu 26.04 is the exception: what it packages clears LazyVim's minimum, so `apt-get install neovim` is genuinely fine there. Arch and Omarchy are fine too - `pacman` tracks upstream closely. Homebrew is fine. Everywhere else on Debian and Ubuntu, use the official binary instead, which the next section walks through. Whichever route you take, run `nvim --version` afterwards and believe that number over this table.
 
 ### You need a Nerd Font
 
@@ -128,7 +127,7 @@ On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the 
 mkdir -p ~/.local/bin && ln -s "$(which fdfind)" ~/.local/bin/fd
 ```
 
-`tree-sitter-cli` is missing from that `apt-get` line on purpose. LazyVim 16 tracks nvim-treesitter's `main` branch, which needs `tree-sitter-cli` 0.26.1 or newer, and every current Debian and Ubuntu release packages something older: 0.20.8 on Ubuntu 24.04 and 25.04, 0.22.6 on Ubuntu 25.10 and on Debian 13, 0.25.9 on Ubuntu 26.04. Upstream also rules out installing it from npm. Take the official binary instead:
+`tree-sitter-cli` is missing from that `apt-get` line on purpose. LazyVim 16 tracks nvim-treesitter's `main` branch, which needs `tree-sitter-cli` 0.26.1 or newer, and no released Debian or Ubuntu packages a version that new: Ubuntu 26.04 has 0.25.9, Debian 13 has 0.22.6, Ubuntu 24.04 has 0.20.8, and Debian 12 does not package it at all. This applies even on Ubuntu 26.04, where NeoVim itself is fine from `apt`. Upstream also rules out installing it from npm. Take the official binary instead:
 
 ```bash
 curl -LO https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz
@@ -157,7 +156,7 @@ Homebrew tracks NeoVim closely, so this gives you a current version.
 
 ### Ubuntu / Debian
 
-**Do not use `apt-get install neovim`.** As the table above shows, every current release ships a version LazyVim cannot use. Install the official binary instead:
+**On Ubuntu 26.04, `sudo apt-get install neovim` is all you need** - it gives you 0.11.6, which is new enough. On Debian, and on any Ubuntu older than 26.04, the packaged version is too old, so install the official binary instead:
 
 ```bash
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
