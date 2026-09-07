@@ -1391,7 +1391,7 @@ archives root-owned paths - `/etc/fstab`, `/etc/docker/daemon.json`,
 `/srv/appdata/jellyfin/config` - so it contains `sudo`. At 02:30 there is no terminal to
 read a password from, and sudo(8) documents that case: *"a terminal is required to read the
 password - sudo needs to read the password but there is no mechanism available for it to do
-so."* The nightly run writes that error into the log file and no archive is created.
+so."* No archive is created.
 
 `crontab -e` under `sudo` edits root's crontab, because crontab(1) without `-u` "examines
 'your' crontab, i.e., the crontab of the person executing the command". A `sudo` inside the
@@ -1770,7 +1770,7 @@ ls -lh /mnt/backup/jellyfin-ollama/
 
 ```bash
 ls -lh /mnt/backup/jellyfin-ollama/
-sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep -E 'srv/compose|etc/fstab|home/'
+sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep -E 'srv/compose|srv/appdata|etc/docker|etc/fstab|home/'
 ```
 
    Compare the newest file's timestamp against the time the job should have run, and confirm
