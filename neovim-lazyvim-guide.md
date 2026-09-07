@@ -247,7 +247,7 @@ That loads every plugin and reports whether each one is happy. LazyVim recommend
 :checkhealth
 ```
 
-Both produce a long report. You are looking for red `ERROR` lines. Warnings about optional providers (Python, Node, Ruby, Perl) are normal and harmless unless you specifically want those features.
+Both produce a long report. You are looking for red `ERROR` lines. Warnings about optional providers (Python, Node, Ruby, Perl) are normal and harmless unless you specifically want those features. `:LazyHealth` also warns that `fzf` is not installed, and on Ubuntu and Debian that `lazygit` is not installed either. Both warnings are expected if you followed [Before You Install](#before-you-install), which leaves those two out deliberately.
 
 If you see boxes or question marks instead of icons, your terminal font is not a Nerd Font. Go back to [Before You Install](#before-you-install).
 
@@ -516,7 +516,9 @@ LazyVim binds these directly, so you can skip the `Ctrl+w` prefix that plain Vim
 
 ### Code navigation
 
-These need a language server, and LazyVim does not fetch one just because you opened a file. Lua works out of the box. For every other language you turn on the matching pack in `:LazyExtras` (see [Keeping LazyVim Updated](#keeping-lazyvim-updated)), which installs that language's server through mason. Until you do, `gd` falls back to Vim's plain search for a local declaration and `gr` and `<leader>cr` do nothing.
+The first five keys below need a language server, and LazyVim does not fetch one just because you opened a file. Lua works out of the box. For every other language you turn on the matching pack in `:LazyExtras` (see [Keeping LazyVim Updated](#keeping-lazyvim-updated)), which installs that language's server through mason. Until you do, those keys fall back to plain Vim: `gd` jumps to a local declaration, `K` opens a man page, and the rest are not bound at all.
+
+The last two rows work without a language server. `<leader>cf` formats through conform, which arrives ready for Lua and shell scripts, and `]d` / `[d` move through NeoVim's own diagnostic list, whatever fills it.
 
 | Keys | What it does |
 |------|--------------|
