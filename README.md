@@ -1,6 +1,6 @@
 # User Guides
 
-A collection of comprehensive beginner guides for developer tools and terminal utilities. These guides are designed for people completely new to each tool, with step-by-step instructions, reference tables, and troubleshooting sections.
+A collection of comprehensive beginner guides for developer tools, terminal utilities, and self-hosted services. These guides are designed for people completely new to each tool, with step-by-step instructions, reference tables, and troubleshooting sections.
 
 ## Available Guides
 
@@ -35,7 +35,23 @@ A collection of comprehensive beginner guides for developer tools and terminal u
   - Launching your first mate, giving it an order, and watching the crew
   - Omarchy keybindings, keeping a fork current, and troubleshooting
 
+- **[Home Server Guide](home-server-guide.md)** - Running a self-hosted Ubuntu home server with Jellyfin, Ollama, Docker, Tailscale, and an NVIDIA GPU
+  - How the storage layout is arranged, and why Docker's data root belongs on the service drive
+  - Everyday operation: switching the GPU between local AI and media transcoding
+  - Choosing and managing Ollama models against the VRAM you actually have
+  - Adding a Docker service, a drive, or a partition without losing data
+  - Backups, single-file recovery, and rebuilding the whole OS drive
+  - Private remote access over Tailscale, with no public port-forward
+
+- **[Overnight LLM Jobs Guide](overnight-llm-jobs-guide.md)** - Running long local-LLM jobs unattended against that server; a companion to the Home Server Guide
+  - A job runner script that survives a closed SSH session
+  - Shell helpers for starting, watching, and stopping jobs
+  - A checklist for leaving a large reasoning model running overnight
+  - Where output lands, what does not survive a reboot, and what to back up
+
 > **If you plan to read the NeoVim and Herdr guides:** `Ctrl+b` means two different things in these two tools - page-up in NeoVim, and the prefix key in Herdr. Inside a Herdr pane, Herdr wins. Both guides explain what to do about it; it catches everyone once.
+
+> **If you are here for the server guides:** read the Home Server Guide first. The Overnight LLM Jobs Guide assumes the layout and the GPU-switching helper it describes.
 
 ## Getting Started
 
@@ -309,7 +325,7 @@ This shows both your fork (origin) and the original repository (upstream).
 
 These guides are updated when the tools they cover change or when someone reports a problem. There is no release schedule, so check the [commit history](https://github.com/modzs/user-guides/commits/master) if you want to know how current a guide is.
 
-Each guide also states which versions of the tools it was checked against. **Where a guide and your own machine disagree, believe your machine** - `herdr --help` and `nvim --version` are the authorities, not this repository.
+Each guide states what it was checked against, and says plainly where a claim could not be verified. **Where a guide and your own machine disagree, believe your machine** - `herdr --help`, `nvim --version`, and your own server are the authorities, not this repository.
 
 - **Check for updates:** `git pull origin master` (if cloned) or `git fetch upstream` (if forked)
 - **Report a problem:** Open an issue on GitHub. Corrections are especially welcome.
@@ -329,6 +345,7 @@ For questions or issues:
    - Herdr: <https://herdr.dev/docs/>
    - NeoVim: `:help` inside the editor, or <https://neovim.io/doc/>
    - LazyVim: <https://lazyvim.org>
+   - Server tools: the Home Server Guide links the official Docker, NVIDIA Container Toolkit, and Tailscale documentation at the steps that use them
 4. Open an issue on the GitHub repository
 
 ---

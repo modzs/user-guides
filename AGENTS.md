@@ -4,10 +4,13 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 
 ## What this repo is
 
-Beginner guides for terminal tools and the agent workflows built on them, written for
-readers who have never used a modal editor or a terminal multiplexer. Content files:
-`README.md`, `herdr-guide.md`, `neovim-lazyvim-guide.md`, `firstmate-guide.md`, plus
-`LICENSE`. No build, no tests, no CI.
+Beginner guides for terminal tools, the agent workflows built on them, and self-hosted
+services, written for readers who have never used a modal editor, a terminal multiplexer,
+or a home server. Content files: `README.md`, `github-cli-guide.md`,
+`herdr-guide.md`, `neovim-lazyvim-guide.md`, `firstmate-guide.md`,
+`home-server-guide.md`, `overnight-llm-jobs-guide.md`, plus `LICENSE`. `README.md`
+indexes every guide under "Available Guides"; adding a guide means adding an entry
+there. No build, no tests, no CI.
 
 ## The rule that matters here
 
@@ -46,6 +49,16 @@ Verification surfaces, all cheap:
   do not go looking for it there. Most obvious `SUPER` combinations are already taken, so
   check before recommending one, and check `command -v` before naming a tool as present
   (Omarchy ships `nvim`, not `vim`).
+- Home-server guides (`home-server-guide.md`, `overnight-llm-jobs-guide.md`): nobody
+  working on this repo has the server these describe, so hardware and performance claims
+  cannot be verified and must be framed as expectations to test rather than measurements.
+  What *is* verifiable, and should be: Ollama CLI flags from `cmd/cmd.go` in
+  <https://github.com/ollama/ollama>, model tags via
+  `https://registry.ollama.ai/v2/library/<model>/manifests/<tag>` (200 means it exists),
+  Docker Hub tags via `https://hub.docker.com/v2/repositories/<repo>/tags/<tag>`, the
+  Compose file reference, the NVIDIA Container Toolkit install guide, Jellyfin's
+  networking docs, and the locally installed `tailscale` CLI. Shell scripts printed in a
+  guide are code: extract the fenced block and at least `bash -n` it.
 
 If something cannot be verified, leave it out or state the limit. An honest gap is
 fine; a confident invention is not.
@@ -61,6 +74,11 @@ believe their own machine over the guide. Keep that.
   real home directory with `/home/you/` when quoting it.
 - The repository is MIT licensed: a `LICENSE` file exists and `README.md`'s `## License`
   section links to it. Keep those two in agreement.
+- Guides describing a personal machine must contain no real addresses, account names, or
+  other identifying detail: this repository is public, and a pushed commit cannot be
+  retracted. The conventions are `/home/you/` for a home directory, `100.x.y.z` for a
+  tailnet address, and `192.168.1.50` for a LAN address, each marked as an example the
+  reader replaces. Scrub before the first `git add`, never after.
 
 ## Maintaining this file
 
