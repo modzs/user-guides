@@ -202,6 +202,28 @@ pid_file() {
   printf '%s/%s.pid' "$RUNNING_DIR" "$1"
 }
 
+# Field 22 of /proc/<pid>/stat is the process start time, measured from boot. It is
+# unique per PID incarnation, so it tells a reused PID apart from the original job.
+# The comm field can contain spaces and parentheses, so drop everything up to ") "
+# before counting fields.
+proc_starttime() {
+  local pid="$1" stat rest
+  stat="$(cat "/proc/$pid/stat" 2>/dev/null)" || return 1
+  rest="${stat#*) }"
+  awk '{print $20}' <<<"$rest"
+}
+
+# True only when this PID is still the process the job started. Fails closed: if
+# anything is missing or unreadable, the answer is "not ours", because the cost of a
+# wrong "yes" is signalling an unrelated process.
+pid_owned_by_job() {
+  local pid="$1" want_start="$2" now_start
+  [[ -n "$pid" && -n "$want_start" ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  now_start="$(proc_starttime "$pid")" || return 1
+  [[ "$now_start" == "$want_start" ]]
+}
+
 read_meta() {
   local job_name="$1"
   local file
@@ -229,7 +251,7 @@ job_state() {
   local pid
   pid="$(cat "$pid_path")"
 
-  if kill -0 "$pid" 2>/dev/null; then
+  if pid_owned_by_job "$pid" "${STARTTIME:-}"; then
     printf 'running (PID %s)' "$pid"
   else
     printf 'finished'
@@ -317,6 +339,7 @@ EOF
   printf '%s\n' "$pid" > "$pid_path"
 
   printf 'PID=%q\n' "$pid" >> "$log_file"
+  printf 'STARTTIME=%q\n' "$(proc_starttime "$pid")" >> "$log_file"
   printf 'Submitted job. It will continue after this terminal disconnects.\n'
   printf 'Check it with: llm-job status %s\n' "$job_name"
   printf 'Follow output:  llm-job tail %s\n' "$job_name"
@@ -400,8 +423,9 @@ stop_job() {
 
   pid="$(cat "$pid_path")"
 
-  if ! kill -0 "$pid" 2>/dev/null; then
-    printf 'Job "%s" is already finished.\n' "$JOB_NAME"
+  if ! pid_owned_by_job "$pid" "${STARTTIME:-}"; then
+    printf 'Job "%s" is already finished, or its record is stale (for example after a\n' "$JOB_NAME"
+    printf 'reboot). PID %s is not this job any more, so nothing was signalled.\n' "$pid"
     rm -f "$pid_path"
     return
   fi
@@ -425,12 +449,16 @@ cleanup() {
   init_dirs
 
   shopt -s nullglob
-  local file pid
+  local file job_name pid
   local files=("$RUNNING_DIR"/*.pid)
 
   for file in "${files[@]}"; do
+    job_name="$(basename "$file" .pid)"
     pid="$(cat "$file" 2>/dev/null || true)"
-    if [[ -z "$pid" ]] || ! kill -0 "$pid" 2>/dev/null; then
+    STARTTIME=""
+    # shellcheck disable=SC1090
+    [[ -f "$(meta_file "$job_name")" ]] && source "$(meta_file "$job_name")"
+    if ! pid_owned_by_job "$pid" "${STARTTIME:-}"; then
       rm -f "$file"
       printf 'Removed stale PID record: %s\n' "$file"
     fi
@@ -774,6 +802,9 @@ After jobs finish, or after a server reboot:
 ai-job-cleanup
 ```
 
+Any job started before the start-time check existed has no recorded start time, so it is
+treated as finished and its record is cleaned up rather than being signalled.
+
 This removes only old PID tracking files whose processes are no longer running. It does not remove prompts or outputs.
 
 ## Job output locations
@@ -850,6 +881,11 @@ ollama ps` showing nothing before you start a replacement job.
 
 `nohup` keeps a job running after an SSH disconnect. It does not survive a server reboot, Docker restart, Ollama container restart, or power loss. If the server reboots, the job ends and partial output may remain.
 
+A job's PID file can outlive the boot that created it, and after a reboot that number may
+belong to an entirely unrelated process. This is why the runner compares the process start
+time it recorded at launch against the process holding the PID now, rather than trusting the
+PID alone: without that check, `stop` would signal whatever inherited the number.
+
 ### Large outputs
 
 For very large research jobs, output files can grow. Check:
@@ -886,7 +922,6 @@ Then retry.
 Check model/GPU/RAM status:
 
 ```bash
-ai-status
 ai-monitor
 ```
 

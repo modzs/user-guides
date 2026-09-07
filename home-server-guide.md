@@ -332,9 +332,6 @@ public internet alongside it.
 
 ### Use local AI
 
-The `ai-*` names below and the bare `ollama` command are helpers you define yourself; see
-[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands) before running them.
-
 Reserve the GPU for AI when you expect substantial LLM use:
 
 ```bash
@@ -1371,15 +1368,36 @@ backup-jellyfin-ollama
 ls -lh /mnt/backup/jellyfin-ollama/
 ```
 
-Suggested schedule after manual testing:
+Suggested schedule after manual testing. Schedule it from **root's** crontab, not your own:
 
 ```bash
-crontab -e
+sudo crontab -e
 ```
 
 ```cron
-30 2 * * * $HOME/.local/bin/backup-jellyfin-ollama >> $HOME/backup-jellyfin-ollama.log 2>&1
+30 2 * * * /home/you/.local/bin/backup-jellyfin-ollama >> /var/log/backup-jellyfin-ollama.log 2>&1
 ```
+
+Substitute your own home directory for `/home/you`. Spell the path out rather than using
+`$HOME`: this entry belongs to root, so `$HOME` here is `/root`, not the account that holds
+the script.
+
+Scheduling this from your own `crontab -e` does not work, and it fails silently. The script
+archives root-owned paths - `/etc/fstab`, `/etc/docker/daemon.json`,
+`/srv/appdata/jellyfin/config` - so it contains `sudo`. At 02:30 there is no terminal to
+read a password from, and sudo(8) documents that case: *"a terminal is required to read the
+password - sudo needs to read the password but there is no mechanism available for it to do
+so."* Your manual test succeeds because you are sitting at a terminal; the nightly run
+writes that error into the log file and no archive is created.
+
+`crontab -e` under `sudo` edits root's crontab, because crontab(1) without `-u` "examines
+'your' crontab, i.e., the crontab of the person executing the command". A `sudo` inside the
+script is harmless when the job is already privileged. Adding a NOPASSWD `sudoers` entry for
+the script is the other conventional route, but a malformed `sudoers` file can lock you out
+of `sudo` entirely, so this guide does not print one.
+
+Whichever route you pick, do not assume it worked - see [Future project: verified automated
+backups](#future-project-verified-automated-backups) for the check that proves it.
 
 ### Add future services to backup
 
@@ -1689,7 +1707,7 @@ hash -r
 Create cache/transcode/model directories if needed:
 
 ```bash
-mkdir -p /srv/appdata/jellyfin/cache /srv/appdata/jellyfin/transcodes /srv/models/ollama
+sudo mkdir -p /srv/appdata/jellyfin/cache /srv/appdata/jellyfin/transcodes /srv/models/ollama
 sudo chown -R "$USER:$USER" /srv/appdata/jellyfin /srv/models
 ```
 
@@ -1745,7 +1763,18 @@ ls -lh /mnt/backup/jellyfin-ollama/
 
 3. Extract one harmless file into `~/restore-check` using the individual-file recovery instructions.
 4. Only after manual backups work, schedule the nightly cron job.
-5. Once per quarter, test restoring a copied file or a disposable Compose file.
+5. The morning after the first scheduled run was due, confirm an archive was *really* written:
+
+```bash
+ls -lh /mnt/backup/jellyfin-ollama/
+```
+
+   Compare the newest file's timestamp against the time the job should have run. A scheduled
+   backup that fails does so silently, so this check is what turns a silent failure into a
+   loud one. Do it again whenever you change the schedule, the script, or the account it
+   runs as.
+
+6. Once per quarter, test restoring a copied file or a disposable Compose file.
 
 ### Future project: automated disk and SMART alerts
 
@@ -1881,10 +1910,6 @@ The GPU request should not be `null`. In Jellyfin, ensure NVIDIA NVENC is select
 
 ### Ollama is slow
 
-`ai-status` and `ollama` are the helpers from
-[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands); without them, read
-`ollama ps` as `docker exec ollama ollama ps`.
-
 ```bash
 gpu-mode ai
 ai-status
@@ -1905,8 +1930,7 @@ du -sh /srv/models/ollama
 du -sh /srv/appdata/jellyfin/*
 ```
 
-Safe first actions (`ollama` here is the wrapper from
-[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands)):
+Safe first actions:
 
 ```bash
 ollama rm MODEL-NAME
@@ -1954,10 +1978,6 @@ Restore missing scripts or shell configuration from backup if needed.
 11. Keep this guide and current backup information outside the OS drive too.
 
 ## Quick reference
-
-The `gpu-mode`, `backup-jellyfin-ollama`, `ollama` and `ai-*` entries below are helpers you
-write yourself - see [Important service files](#important-service-files) and
-[The `ollama` and `ai-*` commands](#the-ollama-and-ai--commands).
 
 ```bash
 # Server state
