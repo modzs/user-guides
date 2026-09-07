@@ -891,8 +891,8 @@ Replace `example-service` with the real lowercase service name.
 Create folders:
 
 ```bash
-mkdir -p /srv/compose/example-service
-mkdir -p /srv/appdata/example-service
+sudo mkdir -p /srv/compose/example-service
+sudo mkdir -p /srv/appdata/example-service
 ```
 
 Create the file with Neovim:
@@ -1347,6 +1347,7 @@ Review Tailscale Machines/access policies and remove old/untrusted devices. Conf
 | `/etc/fstab` | Automatic drive/partition mount configuration. |
 | `/home/you/.bashrc` | AI aliases, hidden-thinking behavior, and PATH setup. |
 | `/home/you/.local/bin/gpu-mode` | GPU switching script. |
+| `/home/you/.local/bin/backup-jellyfin-ollama` | Backup script, if installed. |
 | This guide/current documentation | Makes recovery easier. |
 
 ### Do not routinely back up
@@ -1687,17 +1688,20 @@ mkdir -p ~/restore-check
 cd ~/restore-check
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
   "home/$OLDUSER/.bashrc" \
-  "home/$OLDUSER/.local/bin/gpu-mode"
+  "home/$OLDUSER/.local/bin/gpu-mode" \
+  "home/$OLDUSER/.local/bin/backup-jellyfin-ollama"
 
 mkdir -p "$HOME/.local/bin"
 sudo cp ~/restore-check/home/"$OLDUSER"/.bashrc "$HOME/.bashrc"
 sudo cp ~/restore-check/home/"$OLDUSER"/.local/bin/gpu-mode "$HOME/.local/bin/gpu-mode"
+sudo cp ~/restore-check/home/"$OLDUSER"/.local/bin/backup-jellyfin-ollama "$HOME/.local/bin/backup-jellyfin-ollama"
 
 sudo chown -R "$USER:$USER" /srv/compose
 sudo chown -R "$USER:$USER" /srv/appdata/jellyfin/config
 sudo chown "$USER:$USER" "$HOME/.bashrc"
 sudo chown -R "$USER:$USER" "$HOME/.local"
 sudo chmod 0755 "$HOME/.local/bin/gpu-mode"
+sudo chmod 0755 "$HOME/.local/bin/backup-jellyfin-ollama"
 ```
 
 Reload commands:
@@ -1770,7 +1774,9 @@ ls -lh /mnt/backup/jellyfin-ollama/
 
 ```bash
 ls -lh /mnt/backup/jellyfin-ollama/
-sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep -E 'srv/compose|srv/appdata|etc/docker|etc/fstab|home/'
+sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
+  | grep -Eo '^(srv/compose|srv/appdata|etc/docker|etc/fstab|home)' \
+  | sort -u
 ```
 
    Compare the newest file's timestamp against the time the job should have run, and confirm
@@ -2009,7 +2015,7 @@ cd /srv/compose/jellyfin && docker compose pull && docker compose up -d
 cd /srv/compose/ollama && docker compose pull && docker compose up -d
 
 # Add service
-mkdir -p /srv/compose/SERVICE-NAME /srv/appdata/SERVICE-NAME
+sudo mkdir -p /srv/compose/SERVICE-NAME /srv/appdata/SERVICE-NAME
 nvim /srv/compose/SERVICE-NAME/compose.yaml
 cd /srv/compose/SERVICE-NAME && docker compose config && docker compose up -d
 
