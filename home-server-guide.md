@@ -1377,11 +1377,8 @@ Suggested schedule after manual testing:
 crontab -e
 ```
 
-`crontab` does not expand `~` or `$HOME`, so this line needs real absolute paths. Get yours
-with `echo "$HOME"` and substitute it for `/home/you` in both places:
-
 ```cron
-30 2 * * * /home/you/.local/bin/backup-jellyfin-ollama >> /home/you/backup-jellyfin-ollama.log 2>&1
+30 2 * * * $HOME/.local/bin/backup-jellyfin-ollama >> $HOME/backup-jellyfin-ollama.log 2>&1
 ```
 
 ### Add future services to backup
@@ -1652,8 +1649,10 @@ the name off the `home/` entries first:
 tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep '^home/'
 ```
 
-Use that name wherever `OLDUSER` appears below. Everything outside the archive uses `$HOME`,
-which is already correct for the account you are logged in as:
+Use that name wherever `OLDUSER` appears below. The `srv` paths restore straight to their
+own locations. The two home-directory files go through `~/restore-check` first, the same way
+`/etc/fstab` and `daemon.json` did above, because their path inside the archive is the *old*
+account's while `$HOME` is already correct for the account you are logged in as:
 
 ```bash
 OLDUSER=the-name-you-just-read
@@ -1661,13 +1660,17 @@ OLDUSER=the-name-you-just-read
 cd /
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
   srv/compose \
-  srv/appdata/jellyfin/config \
+  srv/appdata/jellyfin/config
+
+mkdir -p ~/restore-check
+cd ~/restore-check
+sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
   "home/$OLDUSER/.bashrc" \
   "home/$OLDUSER/.local/bin/gpu-mode"
 
-sudo cp "/home/$OLDUSER/.bashrc" "$HOME/.bashrc"
-sudo mkdir -p "$HOME/.local/bin"
-sudo cp "/home/$OLDUSER/.local/bin/gpu-mode" "$HOME/.local/bin/gpu-mode"
+mkdir -p "$HOME/.local/bin"
+sudo cp ~/restore-check/home/"$OLDUSER"/.bashrc "$HOME/.bashrc"
+sudo cp ~/restore-check/home/"$OLDUSER"/.local/bin/gpu-mode "$HOME/.local/bin/gpu-mode"
 
 sudo chown -R "$USER:$USER" /srv/compose
 sudo chown -R "$USER:$USER" /srv/appdata/jellyfin/config
@@ -1675,10 +1678,6 @@ sudo chown "$USER:$USER" "$HOME/.bashrc"
 sudo chown -R "$USER:$USER" "$HOME/.local"
 sudo chmod 0755 "$HOME/.local/bin/gpu-mode"
 ```
-
-If the old account name happens to match the account you are logged in as, the extracted
-files are already in the right place: skip the three lines above that recreate them, because
-`cp` refuses a copy onto the same file with `are the same file` and exits non-zero.
 
 Reload commands:
 

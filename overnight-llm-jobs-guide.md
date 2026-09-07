@@ -825,8 +825,8 @@ support it.
 
 `llm-job stop` kills the host-side `docker exec` client. Docker does not signal a process
 inside a container when its exec client goes away, so the model can keep generating and keep
-holding VRAM after the command reports success. The job disappears from `llm-job list` while
-the work behind it may still be running.
+holding VRAM after the command reports success. `llm-job list` then reports the job as
+`finished or unknown`, while the work behind it may still be running.
 
 That matters because starting a replacement job right after a "stop" can put two large models
 on one GPU at once - exactly the situation [One large job at a
