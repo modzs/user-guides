@@ -40,10 +40,12 @@ Verification surfaces, all cheap:
   events and the active limits, and `bin/*.sh` headers own each script's usage. Never
   describe Firstmate from memory.
 - Omarchy: `omarchy <group> --help` for command shapes, `omarchy menu keybindings --print`
-  for what is already bound, and `/usr/share/omarchy/default/hypr/` for the shipped Lua
-  bindings and the `o.bind`/`hl.unbind` helpers. Most obvious `SUPER` combinations are
-  already taken, so check before recommending one, and check `command -v` before naming a
-  tool as present (Omarchy ships `nvim`, not `vim`).
+  for what is already bound, `/usr/share/omarchy/default/hypr/` for the shipped Lua bindings
+  and the `o.bind` helper, and `/usr/share/omarchy/config/hypr/bindings.lua`, the stock user
+  config template, for `hl.unbind` - which is not defined anywhere under `default/hypr/`, so
+  do not go looking for it there. Most obvious `SUPER` combinations are already taken, so
+  check before recommending one, and check `command -v` before naming a tool as present
+  (Omarchy ships `nvim`, not `vim`).
 
 If something cannot be verified, leave it out or state the limit. An honest gap is
 fine; a confident invention is not.
