@@ -178,8 +178,7 @@ nothing on its own, but "58°C when it idles at 27°C" means something. Do the s
 Create the two directories the rest of this guide writes into. `/srv/compose` is yours all
 the way down; `/srv/appdata` is yours only at the top level, so you can add service folders.
 What a container writes inside its own folder belongs to that container - reach in with
-`sudo`, and after a `sudo tar` restore give those files back to the account the service runs
-as:
+`sudo`:
 
 ```bash
 sudo mkdir -p /srv/compose /srv/appdata
@@ -1681,7 +1680,7 @@ guide cannot know and which need not match the account you just created. List th
 the name off the `home/` entries first:
 
 ```bash
-tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep '^home/'
+sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep '^home/'
 ```
 
 Use that name wherever `OLDUSER` appears below. The `srv` paths restore straight to their

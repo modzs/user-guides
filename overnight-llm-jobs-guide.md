@@ -78,7 +78,7 @@ docker compose stop
 3. Confirm enough free storage exists for the model and output:
 
 ```bash
-df -h /srv
+df -h / /srv
 du -sh /srv/models/ollama
 ```
 
@@ -889,7 +889,7 @@ For very large research jobs, output files can grow. Check:
 
 ```bash
 du -sh ~/llm-jobs
-df -h /srv
+df -h / /srv
 ```
 
 The prompt/output folders live in your home directory, which on this layout is on the OS drive rather than the larger `/srv` service drive. Keep output files reasonably sized. If long-term archival use becomes frequent, move job data to a dedicated directory on `/srv` and add it to the backup plan.
