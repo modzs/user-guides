@@ -301,7 +301,8 @@ Both guides also state which version of the tool they were checked against. **Wh
 
 ## License
 
-These guides are provided as-is for educational purposes. Feel free to use, modify, and share.
+These guides are MIT licensed - see [LICENSE](LICENSE). They are provided as-is for
+educational purposes, so feel free to use, modify, and share them.
 
 ## Support
 
