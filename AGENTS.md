@@ -23,7 +23,9 @@ Verification surfaces, all cheap:
   exhaustive list of what exists: `herdr --default-config` on 0.8.2 omits
   `keys.copy_mode` and the `keys.swap_pane_*` family, which the config reference
   documents. Absence from a printout is not proof a thing does not exist, so check
-  the upstream reference before deleting something as invented.
+  the upstream reference before deleting something as invented. Verify any link you
+  cite by fetching it and confirming the page contains the specific thing you cite it
+  for: an HTTP 200 and a resolving anchor prove neither.
 - NeoVim/LazyVim: `nvim --version`, <https://lazyvim.org> (requirements and the
   authoritative keymap list). Probing a throwaway LazyVim install under a temporary
   `XDG_CONFIG_HOME`/`XDG_DATA_HOME` settles keymap questions in about two minutes;

@@ -899,7 +899,7 @@ To see the options with their defaults and an explanation of each:
 herdr --default-config
 ```
 
-That output is the authoritative schema for everything it prints, but it is not quite the whole list: on 0.8.2 it leaves out `copy_mode` and the `swap_pane_left` / `swap_pane_down` / `swap_pane_up` / `swap_pane_right` family, all of which are real and rebindable. Before concluding a key does not exist, check the complete reference at <https://herdr.dev/docs/configuration/#keybindings>.
+That output is the authoritative schema for everything it prints, but it is not quite the whole list: on 0.8.2 it leaves out `copy_mode` and the `swap_pane_left` / `swap_pane_down` / `swap_pane_up` / `swap_pane_right` family, all of which are real and rebindable. Before concluding a key does not exist, check the complete reference at <https://herdr.dev/docs/config-reference/>.
 
 ### A starter config
 
@@ -1271,6 +1271,7 @@ Closing a pane exits its program. Herdr does not keep a graveyard. Two habits pr
 - CLI reference: <https://herdr.dev/docs/cli-reference/>
 - Agent automation: <https://herdr.dev/docs/agent-automation/>
 - Configuration: <https://herdr.dev/docs/configuration/>
+- Config reference: <https://herdr.dev/docs/config-reference/>
 - Troubleshooting: <https://herdr.dev/docs/troubleshooting/>
 
 If you also use NeoVim, see the [NeoVim and LazyVim guide](neovim-lazyvim-guide.md) - and read its note about the `Ctrl+b` collision before you get confused by it.
