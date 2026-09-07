@@ -14,12 +14,6 @@ editor or a terminal multiplexer. Three content files: `README.md`,
 actually-installed tool or fetched upstream documentation before writing it down.
 Never write it from memory, and never by analogy to a similar tool.**
 
-This is not general caution. The original `herdr-guide.md` was tmux documentation with
-"tmux" search-replaced to "herdr": wrong mental model, invented commands, invented
-config schema, and build instructions pointing at a repository that returns 404. Every
-line of it read plausibly. It was rewritten from scratch in September 2026 for that
-reason.
-
 Verification surfaces, all cheap:
 
 - Herdr: `herdr --help`, `herdr <subcommand> --help`, `herdr --default-config`
@@ -34,7 +28,7 @@ Verification surfaces, all cheap:
   JSON APIs answer "is the packaged version new enough" directly.
 
 If something cannot be verified, leave it out or state the limit. An honest gap is
-fine; a confident invention is the failure this repo already shipped once.
+fine; a confident invention is not.
 
 Guides state the tool version they were checked against, and tell the reader to
 believe their own machine over the guide. Keep that.

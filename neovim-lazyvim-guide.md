@@ -102,23 +102,23 @@ None of these stop LazyVim from starting. Most of them silently disable a featur
 | `curl` | The completion engine |
 | `ripgrep` | Project-wide text search (`<leader>/`) |
 | `fd` | Fast file finding |
-| `fzf` (0.25.1+) | Nothing by default: only the optional fzf-lua picker uses it |
+| `fzf` | Nothing by default: only the optional `editor.fzf` picker uses it |
 | A C compiler | Syntax highlighting via treesitter |
 | `tree-sitter-cli` (0.26.1+) | Nothing on a stock install: LazyVim installs it through mason on first run |
 | `lazygit` | The built-in git interface (optional) |
 
-Install them all in one go:
+Install the rest in one go:
 
 ```bash
 # macOS
-brew install git curl ripgrep fd fzf lazygit
+brew install git curl ripgrep fd lazygit
 
 # Ubuntu/Debian
 sudo apt-get update
-sudo apt-get install git curl ripgrep fd-find fzf build-essential
+sudo apt-get install git curl ripgrep fd-find build-essential
 
 # Arch/Omarchy
-sudo pacman -S git curl ripgrep fd fzf lazygit base-devel
+sudo pacman -S git curl ripgrep fd lazygit base-devel
 ```
 
 On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the usual name:
@@ -127,7 +127,9 @@ On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the 
 mkdir -p ~/.local/bin && ln -s "$(which fdfind)" ~/.local/bin/fd
 ```
 
-Two packages are deliberately absent from that `apt-get` line. `tree-sitter-cli` is not in it because no released Debian or Ubuntu carries a new enough version, and you do not need to chase one: LazyVim installs it for you through mason the first time it builds a parser. `lazygit` is not in it because Ubuntu 24.04 does not carry it at all, and one unknown package makes `apt-get install` refuse the whole line. Debian 13 and Ubuntu 26.04 do have it (`sudo apt-get install lazygit`); anywhere else, follow <https://github.com/jesseduffield/lazygit#installation>. Without `lazygit` on your PATH, LazyVim simply never binds `<leader>gg` and `<leader>gG`, and nothing else changes.
+`fzf` is in none of those commands because nothing in a stock LazyVim runs it; install it only if you later switch pickers with `:LazyExtras` and turn on `editor.fzf`.
+
+Two more packages are deliberately absent from that `apt-get` line. `tree-sitter-cli` is not in it because no released Debian or Ubuntu carries a new enough version, and you do not need to chase one: LazyVim installs it for you through mason the first time it builds a parser. `lazygit` is not in it because Ubuntu 24.04 does not carry it at all, and one unknown package makes `apt-get install` refuse the whole line. Debian 13 and Ubuntu 26.04 do have it (`sudo apt-get install lazygit`); anywhere else, follow <https://github.com/jesseduffield/lazygit#installation>. Without `lazygit` on your PATH, LazyVim simply never binds `<leader>gg` and `<leader>gG`, and nothing else changes.
 
 You also want a terminal that supports true colour and undercurl: kitty, WezTerm, Alacritty, Ghostty, or iTerm2 all qualify.
 
@@ -514,7 +516,7 @@ LazyVim binds these directly, so you can skip the `Ctrl+w` prefix that plain Vim
 
 ### Code navigation
 
-These need a language server, which LazyVim installs automatically the first time you open a file in a supported language.
+These need a language server, and LazyVim does not fetch one just because you opened a file. Lua works out of the box. For every other language you turn on the matching pack in `:LazyExtras` (see [Keeping LazyVim Updated](#keeping-lazyvim-updated)), which installs that language's server through mason. Until you do, `gd` falls back to Vim's plain search for a local declaration and `gr` and `<leader>cr` do nothing.
 
 | Keys | What it does |
 |------|--------------|
