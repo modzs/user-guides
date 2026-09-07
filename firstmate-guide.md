@@ -9,11 +9,11 @@ on macOS and other Linux distributions; only the installation and desktop-config
 steps here are Omarchy-only.
 
 **Version note:** Everything in this guide was checked against **Herdr 0.8.2** (Omarchy's
-packaged build), **Omarchy's shipped Hyprland configuration**, and the **Firstmate
-repository as of commit `f3b7e74`, September 2026**. Firstmate moves fast and Herdr moves
-faster. If a command here disagrees with your machine, your machine is right. The
-authorities are `herdr --help`, `herdr --version`, and the `AGENTS.md` and `docs/` files
-inside your own Firstmate clone.
+packaged build), **Omarchy's shipped Hyprland configuration**, **Claude Code 2.1.259**, and
+the **Firstmate repository as of commit `f3b7e74`, September 2026**. Firstmate moves fast
+and Herdr moves faster. If a command here disagrees with your machine, your machine is
+right. The authorities are `herdr --help`, `herdr --version`, and the `AGENTS.md` and
+`docs/` files inside your own Firstmate clone.
 
 ## Table of Contents
 1. [What Firstmate Actually Is](#what-firstmate-actually-is)

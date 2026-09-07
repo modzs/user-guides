@@ -21,7 +21,7 @@ A collection of comprehensive beginner guides for developer tools and terminal u
 
 - **[Firstmate Guide](firstmate-guide.md)** - Installing and running Firstmate, an agent distro for running a crew of coding agents, on Omarchy Linux with the Herdr backend
   - What an "agent distro" is, and why there is no `firstmate` binary to install
-  - Installing Herdr, the Claude Code integration, and the rest of the toolchain
+  - Installing Herdr, installing and signing in to Claude Code, its Herdr integration, and the rest of the toolchain
   - Forking, cloning, and selecting the Herdr backend
   - Launching your first mate, giving it an order, and watching the crew
   - Omarchy keybindings, keeping a fork current, and troubleshooting
