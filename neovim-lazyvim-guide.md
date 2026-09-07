@@ -94,7 +94,7 @@ Omarchy users: the default terminal is already configured with a Nerd Font, so t
 
 ### Other tools LazyVim expects
 
-None of these stop LazyVim from starting, but each one silently disables a feature until you install it.
+None of these stop LazyVim from starting. Most of them silently disable a feature until you install them, and the table says which.
 
 | Tool | What breaks without it |
 |------|------------------------|
@@ -102,23 +102,23 @@ None of these stop LazyVim from starting, but each one silently disables a featu
 | `curl` | The completion engine |
 | `ripgrep` | Project-wide text search (`<leader>/`) |
 | `fd` | Fast file finding |
-| `fzf` (0.25.1+) | Fuzzy pickers |
+| `fzf` (0.25.1+) | Nothing by default: only the optional fzf-lua picker uses it |
 | A C compiler | Syntax highlighting via treesitter |
-| `tree-sitter-cli` (0.26.1+) | The same thing: LazyVim builds treesitter parsers with it |
+| `tree-sitter-cli` (0.26.1+) | Nothing on a stock install: LazyVim installs it through mason on first run |
 | `lazygit` | The built-in git interface (optional) |
 
 Install them all in one go:
 
 ```bash
 # macOS
-brew install git curl ripgrep fd fzf lazygit tree-sitter
+brew install git curl ripgrep fd fzf lazygit
 
 # Ubuntu/Debian
 sudo apt-get update
 sudo apt-get install git curl ripgrep fd-find fzf build-essential
 
 # Arch/Omarchy
-sudo pacman -S git curl ripgrep fd fzf lazygit base-devel tree-sitter-cli
+sudo pacman -S git curl ripgrep fd fzf lazygit base-devel
 ```
 
 On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the usual name:
@@ -127,16 +127,7 @@ On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the 
 mkdir -p ~/.local/bin && ln -s "$(which fdfind)" ~/.local/bin/fd
 ```
 
-`tree-sitter-cli` is missing from that `apt-get` line on purpose. LazyVim 16 tracks nvim-treesitter's `main` branch, which needs `tree-sitter-cli` 0.26.1 or newer, and no released Debian or Ubuntu packages a version that new: Ubuntu 26.04 has 0.25.9, Debian 13 has 0.22.6, Ubuntu 24.04 has 0.20.8, and Debian 12 does not package it at all. This applies even on Ubuntu 26.04, where NeoVim itself is fine from `apt`. Upstream also rules out installing it from npm. Take the official binary instead:
-
-```bash
-curl -LO https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz
-gunzip tree-sitter-linux-x64.gz
-chmod +x tree-sitter-linux-x64
-sudo mv tree-sitter-linux-x64 /usr/local/bin/tree-sitter
-```
-
-On ARM machines, replace `x64` with `arm64`. Then confirm it with `tree-sitter --version`. Without it, LazyVim still starts, but parser installation fails and syntax highlighting stays plain.
+Two packages are deliberately absent from that `apt-get` line. `tree-sitter-cli` is not in it because no released Debian or Ubuntu carries a new enough version, and you do not need to chase one: LazyVim installs it for you through mason the first time it builds a parser. `lazygit` is not in it because Ubuntu 24.04 does not carry it at all, and one unknown package makes `apt-get install` refuse the whole line. Debian 13 and Ubuntu 26.04 do have it (`sudo apt-get install lazygit`); anywhere else, follow <https://github.com/jesseduffield/lazygit#installation>. Without `lazygit` on your PATH, LazyVim simply never binds `<leader>gg` and `<leader>gG`, and nothing else changes.
 
 You also want a terminal that supports true colour and undercurl: kitty, WezTerm, Alacritty, Ghostty, or iTerm2 all qualify.
 
