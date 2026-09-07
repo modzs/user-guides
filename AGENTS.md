@@ -16,9 +16,14 @@ Never write it from memory, and never by analogy to a similar tool.**
 
 Verification surfaces, all cheap:
 
-- Herdr: `herdr --help`, `herdr <subcommand> --help`, `herdr --default-config`
-  (authoritative config schema and every default keybinding), `herdr --version`,
-  and <https://herdr.dev/llms.txt> for the upstream docs index.
+- Herdr: `herdr --help`, `herdr <subcommand> --help`, `herdr --default-config`,
+  `herdr --version`, and <https://herdr.dev/llms.txt> for the upstream docs index,
+  whose "Config reference" JSON lists every canonical `config.toml` key with its
+  type and default. A tool's own output is authoritative for what it emits, not an
+  exhaustive list of what exists: `herdr --default-config` on 0.8.2 omits
+  `keys.copy_mode` and the `keys.swap_pane_*` family, which the config reference
+  documents. Absence from a printout is not proof a thing does not exist, so check
+  the upstream reference before deleting something as invented.
 - NeoVim/LazyVim: `nvim --version`, <https://lazyvim.org> (requirements and the
   authoritative keymap list). Probing a throwaway LazyVim install under a temporary
   `XDG_CONFIG_HOME`/`XDG_DATA_HOME` settles keymap questions in about two minutes;

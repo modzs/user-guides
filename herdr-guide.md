@@ -893,13 +893,13 @@ Full details: <https://herdr.dev/docs/agent-automation/> and <https://herdr.dev/
 
 **Herdr works fine with no config file at all.** Only create one when you want to change something.
 
-To see every available option with its default and an explanation:
+To see the options with their defaults and an explanation of each:
 
 ```bash
 herdr --default-config
 ```
 
-That output is the authoritative schema. If a key is not in there, it is not a real key.
+That output is the authoritative schema for everything it prints, but it is not quite the whole list: on 0.8.2 it leaves out `copy_mode` and the `swap_pane_left` / `swap_pane_down` / `swap_pane_up` / `swap_pane_right` family, all of which are real and rebindable. Before concluding a key does not exist, check the complete reference at <https://herdr.dev/docs/configuration/#keybindings>.
 
 ### A starter config
 
@@ -1042,7 +1042,7 @@ With `herdr --skill` installed into your agent's instructions, a lead agent can 
 | `herdr status` | Client and server status |
 | `herdr --version` | Print the version |
 | `herdr --help` | Full command list for your build |
-| `herdr --default-config` | Print the full config schema |
+| `herdr --default-config` | Print the commented default config |
 | `herdr --skill` | Print the agent skill file |
 | `herdr update` | Update an installer-managed install |
 | `herdr channel show` / `set <stable\|preview>` | Update channel |
