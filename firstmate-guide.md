@@ -171,7 +171,9 @@ omarchy pkg add python                    # only if you want the optional featur
 ```
 
 Claude Code is deliberately not in that `omarchy pkg add` line. Step 2 below installs it
-through Omarchy's own agent command, which is the route this guide uses.
+through Omarchy's own agent command, which is the route this guide uses. Using Claude Code
+also requires a Claude account, and Claude Code has to be signed in before the first mate
+can do anything at all. Step 2 covers that too.
 
 Note that on Arch, and therefore on Omarchy, the Python 3 package is called `python`, not
 `python3`. The binary it puts on your `PATH` is still `python3`.
@@ -210,16 +212,32 @@ You should see `herdr 0.8.2` or newer.
 omarchy default agent claude
 ```
 
-That one command does three things: it installs Claude Code through `mise` if `mise where
+**That command opens a separate terminal window, and the work happens in that window.**
+Your own prompt returns immediately. When Claude Code is not installed yet, Omarchy re-runs
+itself in a floating window and does the `mise` install there, so closing that window early
+aborts the install and leaves you with no `claude` and no `~/.claude`. Stay in the new
+window until you are finished.
+
+The command itself does three things: it installs Claude Code through `mise` if `mise where
 claude` finds nothing, writes `claude` into `~/.config/omarchy/defaults/agent` as Omarchy's
 default coding agent, and then launches it. (`mise` resolves the name `claude` to
 `aqua:anthropics/claude-code`.)
 
-Let it launch once, then quit it. That is the easiest way to create `~/.claude`, which the
-next step needs.
+Claude Code requires a Claude account and does nothing until it is signed in, so complete
+the sign-in on this first launch, then quit. That first launch is also what creates
+`~/.claude`, which the next step needs.
 
-If you already have Claude Code installed by some other route, you can skip this step. All
-the next step requires is that your Claude configuration directory exists.
+This guide does not reproduce the sign-in procedure, because that flow changes and it was
+not verified here. Anthropic documents it under "Step 2: Log in to your account" in the
+[Claude Code quickstart](https://code.claude.com/docs/en/quickstart). From the shell,
+`claude auth status` shows whether you are signed in and `claude auth login` signs you in.
+
+Note that Omarchy launches the agent as `claude --permission-mode auto`. That is why this
+guide starts the first mate with a plain `claude` from inside the repo later on, rather
+than through Omarchy's agent launcher.
+
+If you already have Claude Code installed and signed in by some other route, you can skip
+this step. All the next step requires is that your Claude configuration directory exists.
 
 ### Step 3: Install the Herdr integration for Claude Code
 
@@ -392,8 +410,9 @@ default.
 
 Two details matter if you are on an older Herdr:
 
-- Below the floor, a home that has never configured this uses the ordinary flat per-home
-  layout instead, and warns once per home per detected release. Upgrading Herdr is the fix.
+- Below the floor, an install that has never configured this creates each `fm-<id>` task
+  tab directly in the first mate's own workspace instead, and warns once per detected
+  release. Upgrading Herdr is the fix.
 - An explicit opt-in is honored *below* the floor too, so a home that deliberately turned
   the projection on is never silently downgraded.
 
@@ -740,6 +759,21 @@ chmod +x ~/.local/bin/sync-firstmate
 Expected. See [What actually happens, and what does
 not](#what-actually-happens-and-what-does-not). Confirm you are in `~/Projects/firstmate`
 with a capital P, and that you have actually given the first mate an order.
+
+### Claude Code asks you to sign in instead of showing the toolchain report
+
+Claude Code requires an account, so an install that has never been signed in stops at its
+sign-in prompt before the first mate ever reads `AGENTS.md`. Complete the sign-in and
+relaunch. From the shell:
+
+```bash
+claude auth status     # are you signed in?
+claude auth login      # sign in
+```
+
+Anthropic documents the procedure under "Step 2: Log in to your account" in the [Claude
+Code quickstart](https://code.claude.com/docs/en/quickstart); this guide does not reproduce
+it.
 
 ### Herdr not found
 
