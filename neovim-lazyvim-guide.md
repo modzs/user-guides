@@ -105,20 +105,21 @@ None of these stop LazyVim from starting, but each one silently disables a featu
 | `fd` | Fast file finding |
 | `fzf` (0.25.1+) | Fuzzy pickers |
 | A C compiler | Syntax highlighting via treesitter |
+| `tree-sitter-cli` (0.26.1+) | The same thing: LazyVim builds treesitter parsers with it |
 | `lazygit` | The built-in git interface (optional) |
 
 Install them all in one go:
 
 ```bash
 # macOS
-brew install git curl ripgrep fd fzf lazygit
+brew install git curl ripgrep fd fzf lazygit tree-sitter
 
 # Ubuntu/Debian
 sudo apt-get update
 sudo apt-get install git curl ripgrep fd-find fzf build-essential
 
 # Arch/Omarchy
-sudo pacman -S git curl ripgrep fd fzf lazygit base-devel
+sudo pacman -S git curl ripgrep fd fzf lazygit base-devel tree-sitter-cli
 ```
 
 On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the usual name:
@@ -126,6 +127,17 @@ On Debian and Ubuntu the `fd` command is installed as `fdfind`. If you want the 
 ```bash
 mkdir -p ~/.local/bin && ln -s "$(which fdfind)" ~/.local/bin/fd
 ```
+
+`tree-sitter-cli` is missing from that `apt-get` line on purpose. LazyVim 16 tracks nvim-treesitter's `main` branch, which needs `tree-sitter-cli` 0.26.1 or newer, and every current Debian and Ubuntu release packages something older: 0.20.8 on Ubuntu 24.04 and 25.04, 0.22.6 on Ubuntu 25.10 and on Debian 13, 0.25.9 on Ubuntu 26.04. Upstream also rules out installing it from npm. Take the official binary instead:
+
+```bash
+curl -LO https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-x64.gz
+gunzip tree-sitter-linux-x64.gz
+chmod +x tree-sitter-linux-x64
+sudo mv tree-sitter-linux-x64 /usr/local/bin/tree-sitter
+```
+
+On ARM machines, replace `x64` with `arm64`. Then confirm it with `tree-sitter --version`. Without it, LazyVim still starts, but parser installation fails and syntax highlighting stays plain.
 
 You also want a terminal that supports true colour and undercurl: kitty, WezTerm, Alacritty, Ghostty, or iTerm2 all qualify.
 
