@@ -175,8 +175,11 @@ the server. That idle baseline is what makes a future reading meaningful - "58°
 nothing on its own, but "58°C when it idles at 27°C" means something. Do the same with
 `smartctl -a` for each drive, so you have a starting point for its wear counters.
 
-Create the two directories the rest of this guide writes into, and hand them to your own
-account so later steps do not need `sudo`:
+Create the two directories the rest of this guide writes into. `/srv/compose` is yours all
+the way down; `/srv/appdata` is yours only at the top level, so you can add service folders.
+What a container writes inside its own folder belongs to that container - reach in with
+`sudo`, and after a `sudo tar` restore give those files back to the account the service runs
+as:
 
 ```bash
 sudo mkdir -p /srv/compose /srv/appdata
@@ -1513,9 +1516,9 @@ If Jellyfin config is lost, stop Jellyfin, rename the damaged directory, then re
 cd /srv/compose/jellyfin
 docker compose stop
 
-mv /srv/appdata/jellyfin/config \
+sudo mv /srv/appdata/jellyfin/config \
   /srv/appdata/jellyfin/config.damaged-$(date +%F-%H%M%S)
-mkdir -p /srv/appdata/jellyfin/config
+sudo mkdir -p /srv/appdata/jellyfin/config
 
 cd /
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
@@ -1615,6 +1618,7 @@ Install Docker, create `/etc/docker`, and restore `daemon.json`:
 
 ```bash
 sudo mkdir -p /etc/docker /srv/docker /srv/compose /srv/appdata /srv/models
+sudo chown "$USER:$USER" /srv/compose /srv/appdata
 cd ~/restore-check
 sudo tar -xzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz etc/docker/daemon.json
 sudo cp ~/restore-check/etc/docker/daemon.json /etc/docker/daemon.json
