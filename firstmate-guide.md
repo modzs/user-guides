@@ -159,6 +159,7 @@ git --version
 gh --version
 node --version
 jq --version
+claude --version
 python3 --version      # optional
 ```
 
@@ -168,6 +169,9 @@ Install anything missing from that list:
 omarchy pkg add git github-cli nodejs jq
 omarchy pkg add python                    # only if you want the optional features
 ```
+
+Claude Code is deliberately not in that `omarchy pkg add` line. Step 2 below installs it
+through Omarchy's own agent command, which is the route this guide uses.
 
 Note that on Arch, and therefore on Omarchy, the Python 3 package is called `python`, not
 `python3`. The binary it puts on your `PATH` is still `python3`.
@@ -200,7 +204,34 @@ You should see `herdr 0.8.2` or newer.
 > Guide](herdr-guide.md) in this repository covers the other install methods and their
 > update paths.
 
-### Step 2: Install the Herdr integration for Claude Code
+### Step 2: Install Claude Code
+
+```bash
+omarchy default agent claude
+```
+
+That one command does three things: it installs Claude Code through `mise` if `mise where
+claude` finds nothing, writes `claude` into `~/.config/omarchy/defaults/agent` as Omarchy's
+default coding agent, and then launches it. (`mise` resolves the name `claude` to
+`aqua:anthropics/claude-code`.)
+
+Let it launch once, then quit it. That is the easiest way to create `~/.claude`, which the
+next step needs.
+
+If you already have Claude Code installed by some other route, you can skip this step. All
+the next step requires is that your Claude configuration directory exists.
+
+### Step 3: Install the Herdr integration for Claude Code
+
+**Your Claude configuration directory has to exist before you run this install.** Herdr
+checks for the directory, not for the `claude` binary, so if Step 2 has not created
+`~/.claude` yet, create it yourself:
+
+```bash
+mkdir -p ~/.claude
+```
+
+If you have set `CLAUDE_CONFIG_DIR`, that is the directory Herdr checks instead. Then:
 
 ```bash
 herdr integration install claude
@@ -234,11 +265,10 @@ OpenCode, Kilo Code CLI, and MastraCode get *lifecycle authority*, where their h
 the state directly. Claude Code, Codex, Copilot, Cursor Agent CLI and the rest get
 *session identity* only. Claude Code is in the second group.
 
-Two practical notes: your Claude configuration directory has to exist before you run the
-install, and installing writes `hooks/herdr-agent-state.sh` and adds Herdr entries to your
+Installing writes `hooks/herdr-agent-state.sh` and adds Herdr entries to your
 `settings.json`. Uninstalling removes both.
 
-### Step 3: Authenticate with GitHub
+### Step 4: Authenticate with GitHub
 
 ```bash
 gh auth login
@@ -247,17 +277,17 @@ gh auth login
 Choose SSH if you plan to push, since the clone commands below use an SSH remote. HTTPS
 works too if you let `gh` manage your credentials.
 
-### Step 4: Fork Firstmate (optional)
+### Step 5: Fork Firstmate (optional)
 
 Forking is optional. Fork if you want to keep local customizations under version control.
-Otherwise clone upstream directly and skip to Step 5.
+Otherwise clone upstream directly and skip to Step 6.
 
 1. Open <https://github.com/kunchenguid/firstmate>
 2. Click **Fork**
 3. Select your account
 4. Your fork lands at `https://github.com/YOUR_USERNAME/firstmate`
 
-### Step 5: Clone
+### Step 6: Clone
 
 ```bash
 mkdir -p ~/Projects
@@ -280,9 +310,9 @@ Firstmate. That single typo is the most common reason Firstmate appears to "do n
 Note that `projects/` *inside* the repo is a completely different thing. It is gitignored,
 and it is where Firstmate clones the projects you ask it to work on.
 
-### Step 6: Add the upstream remote
+### Step 7: Add the upstream remote
 
-Only needed if you forked in Step 4.
+Only needed if you forked in Step 5.
 
 ```bash
 git remote add upstream https://github.com/kunchenguid/firstmate
@@ -481,8 +511,19 @@ and not a command parser. Chaining requests with `AND` is how you get parallel c
 
 ## Watching the Crew
 
-Attach to the Herdr session and switch to the workspace labeled `firstmate` to see the task
-tabs, one per task, named `fm-<id>`.
+You launched the first mate from a pane inside Herdr, so its tasks appear next to the
+workspace that pane lives in. With presentation spaces on, which is the default on Herdr
+0.8.0 and newer, every crewmate or scout gets its own disposable single-task workspace
+holding one `fm-<id>` tab, bound to the first mate's own workspace as its placement
+reference. Attach to the Herdr session and look at the workspaces around the first mate's
+to watch them. Where ordering is available they sit in one contiguous block immediately
+after the first mate's workspace, but ordering is best-effort and needs protocol 16 and
+`python3`; without it they land wherever Herdr puts them.
+
+Turn presentation spaces off and the `fm-<id>` tabs are created directly in the first
+mate's own workspace instead. A workspace labeled `firstmate` is a third case, and not the
+one this guide produces: that home-labeled workspace is maintained only when the first mate
+runs *outside* Herdr and so has no launcher workspace to inherit.
 
 You usually do not need to attach at all. Supervise from the first mate session instead:
 
@@ -591,7 +632,7 @@ error, fix it before you go looking for why your key does nothing.
 
 ## Keeping Your Fork Up to Date
 
-This section is only relevant if you forked in Step 4.
+This section is only relevant if you forked in Step 5.
 
 > **Firstmate's default branch is `main`.** That is different from this guides repository,
 > whose default branch is `master`. The commands below are correct for Firstmate as
@@ -709,6 +750,19 @@ omarchy pkg add herdr
 
 If `herdr --version` still fails after installing, restart your terminal so it picks up the
 new `PATH`.
+
+### `claude directory not found at <path>. install claude code first`
+
+`herdr integration install claude` prints this and writes nothing. It is checking for your
+Claude configuration directory, not for the `claude` binary. Either install Claude Code
+with `omarchy default agent claude` and let it launch once, which creates the directory, or,
+if Claude Code is already installed, create the directory yourself:
+
+```bash
+mkdir -p ~/.claude
+```
+
+If `CLAUDE_CONFIG_DIR` is set, that is the path Herdr is reporting.
 
 ### The first mate says a tool is missing
 
