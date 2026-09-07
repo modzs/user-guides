@@ -28,7 +28,14 @@ A collection of comprehensive beginner guides for developer tools and terminal u
   - Running, monitoring, and scripting AI coding agents
   - Configuration, workflow patterns, and troubleshooting
 
-> **If you plan to read both:** `Ctrl+b` means two different things in these two tools - page-up in NeoVim, and the prefix key in Herdr. Inside a Herdr pane, Herdr wins. Both guides explain what to do about it; it catches everyone once.
+- **[Firstmate Guide](firstmate-guide.md)** - Installing and running Firstmate, an agent distro for running a crew of coding agents, on Omarchy Linux with the Herdr backend
+  - What an "agent distro" is, and why there is no `firstmate` binary to install
+  - Installing Herdr, installing and signing in to Claude Code, its Herdr integration, and the rest of the toolchain
+  - Forking, cloning, and selecting the Herdr backend
+  - Launching your first mate, giving it an order, and watching the crew
+  - Omarchy keybindings, keeping a fork current, and troubleshooting
+
+> **If you plan to read the NeoVim and Herdr guides:** `Ctrl+b` means two different things in these two tools - page-up in NeoVim, and the prefix key in Herdr. Inside a Herdr pane, Herdr wins. Both guides explain what to do about it; it catches everyone once.
 
 ## Getting Started
 
@@ -36,7 +43,7 @@ Just want to read the guides? You do not need git, a GitHub account, or any of t
 
 ### Read them in your browser
 
-Click either guide in the list above. GitHub renders them, and that is the whole process.
+Click any guide in the list above. GitHub renders them, and that is the whole process.
 
 ### Read them offline
 
@@ -302,7 +309,7 @@ This shows both your fork (origin) and the original repository (upstream).
 
 These guides are updated when the tools they cover change or when someone reports a problem. There is no release schedule, so check the [commit history](https://github.com/modzs/user-guides/commits/master) if you want to know how current a guide is.
 
-Both guides also state which version of the tool they were checked against. **Where a guide and your own machine disagree, believe your machine** - `herdr --help` and `nvim --version` are the authorities, not this repository.
+Each guide also states which versions of the tools it was checked against. **Where a guide and your own machine disagree, believe your machine** - `herdr --help` and `nvim --version` are the authorities, not this repository.
 
 - **Check for updates:** `git pull origin master` (if cloned) or `git fetch upstream` (if forked)
 - **Report a problem:** Open an issue on GitHub. Corrections are especially welcome.
