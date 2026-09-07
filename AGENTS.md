@@ -4,9 +4,10 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 
 ## What this repo is
 
-Beginner guides for terminal tools, written for readers who have never used a modal
-editor or a terminal multiplexer. Three content files: `README.md`,
-`herdr-guide.md`, `neovim-lazyvim-guide.md`. No build, no tests, no CI.
+Beginner guides for terminal tools and the agent workflows built on them, written for
+readers who have never used a modal editor or a terminal multiplexer. Content files:
+`README.md`, `herdr-guide.md`, `neovim-lazyvim-guide.md`, `firstmate-guide.md`, plus
+`LICENSE`. No build, no tests, no CI.
 
 ## The rule that matters here
 
@@ -33,6 +34,16 @@ Verification surfaces, all cheap:
   probe must fire that event before reading them.
 - Distribution package versions: the Debian, Ubuntu Launchpad, Arch, and Homebrew
   JSON APIs answer "is the packaged version new enough" directly.
+- Firstmate: its own clone is the only authority. `README.md` owns the supported primary
+  harnesses and requirements, `docs/configuration.md` owns backend selection order and the
+  toolchain list, `docs/herdr-backend.md` owns Herdr placement, presentation spaces, push
+  events and the active limits, and `bin/*.sh` headers own each script's usage. Never
+  describe Firstmate from memory.
+- Omarchy: `omarchy <group> --help` for command shapes, `omarchy menu keybindings --print`
+  for what is already bound, and `/usr/share/omarchy/default/hypr/` for the shipped Lua
+  bindings and the `o.bind`/`hl.unbind` helpers. Most obvious `SUPER` combinations are
+  already taken, so check before recommending one, and check `command -v` before naming a
+  tool as present (Omarchy ships `nvim`, not `vim`).
 
 If something cannot be verified, leave it out or state the limit. An honest gap is
 fine; a confident invention is not.
@@ -46,8 +57,8 @@ believe their own machine over the guide. Keep that.
   master` are correct; do not "fix" them.
 - Shown command output must be output actually observed, not reconstructed. Replace a
   real home directory with `/home/you/` when quoting it.
-- There is a `## License` section in `README.md` but no `LICENSE` file. That gap is the
-  repository owner's call, so leave both alone unless asked.
+- The repository is MIT licensed: a `LICENSE` file exists and `README.md`'s `## License`
+  section links to it. Keep those two in agreement.
 
 ## Maintaining this file
 
