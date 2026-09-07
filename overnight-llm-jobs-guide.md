@@ -129,6 +129,10 @@ mkdir -p ~/llm-jobs/{prompts,output,error,logs,running}
 
 ## Overnight job runner script
 
+```bash
+mkdir -p ~/.local/bin
+```
+
 Create the file:
 
 ```text
@@ -961,6 +965,13 @@ source ~/.bashrc
 hash -r
 command -v llm-job
 ls -l ~/.local/bin/llm-job
+```
+
+If `~/.local/bin` did not exist when you logged in, it may not be on your `PATH` yet - log
+out and back in, or run this for the current session:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 If the file exists but is not executable:

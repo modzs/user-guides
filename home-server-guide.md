@@ -1984,6 +1984,13 @@ type ai
 ls -l ~/.local/bin/gpu-mode
 ```
 
+If `~/.local/bin` did not exist when you logged in, it may not be on your `PATH` yet - log
+out and back in, or run this for the current session:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 Restore missing scripts or shell configuration from backup if needed.
 
 ## Safety rules
