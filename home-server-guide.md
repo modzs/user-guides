@@ -175,6 +175,14 @@ the server. That idle baseline is what makes a future reading meaningful - "58°
 nothing on its own, but "58°C when it idles at 27°C" means something. Do the same with
 `smartctl -a` for each drive, so you have a starting point for its wear counters.
 
+Create the two directories the rest of this guide writes into, and hand them to your own
+account so later steps do not need `sudo`:
+
+```bash
+sudo mkdir -p /srv/compose /srv/appdata
+sudo chown "$USER:$USER" /srv/compose /srv/appdata
+```
+
 ### Docker and GPU support
 
 Install Docker Engine, the Compose plugin, Buildx, and containerd from Docker's own
@@ -891,8 +899,8 @@ Replace `example-service` with the real lowercase service name.
 Create folders:
 
 ```bash
-sudo mkdir -p /srv/compose/example-service
-sudo mkdir -p /srv/appdata/example-service
+mkdir -p /srv/compose/example-service
+mkdir -p /srv/appdata/example-service
 ```
 
 Create the file with Neovim:
@@ -1382,10 +1390,11 @@ sudo crontab -e
 Substitute your own home directory for `/home/you`. Spell the path out rather than using
 `$HOME`: this entry belongs to root, so `$HOME` here is `/root`, not the account that holds
 the script. The same applies *inside* `backup-jellyfin-ollama` - under this schedule `~` and
-`$HOME` are `/root` there too, so write `/home/you/.bashrc` and
-`/home/you/.local/bin/gpu-mode` in the `sudo tar` command rather than `~/.bashrc` and
-`~/.local/bin/gpu-mode`, or the nightly archive will quietly capture root's dotfiles instead
-of yours.
+`$HOME` are `/root` there too, so write `/home/you/.bashrc`,
+`/home/you/.local/bin/gpu-mode` and `/home/you/.local/bin/backup-jellyfin-ollama` in the
+`sudo tar` command rather than `~/.bashrc`, `~/.local/bin/gpu-mode` and
+`~/.local/bin/backup-jellyfin-ollama`, or the nightly archive will quietly capture root's
+dotfiles instead of yours.
 
 Scheduling this from your own `crontab -e` does not work, and it fails silently. The script
 archives root-owned paths - `/etc/fstab`, `/etc/docker/daemon.json`,
@@ -1554,7 +1563,7 @@ Use this only if the Ubuntu OS drive fails, cannot boot, or is replaced. Media a
 5. Install Docker and restore `/etc/docker/daemon.json`.
 6. Install NVIDIA driver and NVIDIA Container Toolkit.
 7. Install/authenticate Tailscale.
-8. Restore Compose files, Jellyfin config, `.bashrc`, and `gpu-mode`.
+8. Restore Compose files, Jellyfin config, `.bashrc`, `gpu-mode`, and `backup-jellyfin-ollama`.
 9. Start Ollama/Jellyfin.
 10. Test LAN, Tailscale, GPU, storage, and application health.
 11. Re-download Ollama models if absent.
@@ -1672,9 +1681,10 @@ tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz | grep '^home/'
 ```
 
 Use that name wherever `OLDUSER` appears below. The `srv` paths restore straight to their
-own locations. The two home-directory files go through `~/restore-check` first, the same way
-`/etc/fstab` and `daemon.json` did above, because their path inside the archive is the *old*
-account's while `$HOME` is already correct for the account you are logged in as:
+own locations. The three home-directory files go through `~/restore-check` first, the same
+way `/etc/fstab` and `daemon.json` did above, because their path inside the archive is the
+*old* account's while `$HOME` is already correct for the account you are logged in as -
+skip any of these helpers you never wrote:
 
 ```bash
 OLDUSER=the-name-you-just-read
@@ -1775,7 +1785,7 @@ ls -lh /mnt/backup/jellyfin-ollama/
 ```bash
 ls -lh /mnt/backup/jellyfin-ollama/
 sudo tar -tzf /mnt/backup/jellyfin-ollama/ARCHIVE-NAME.tar.gz \
-  | grep -Eo '^(srv/compose|srv/appdata|etc/docker|etc/fstab|home)' \
+  | cut -d/ -f1-3 \
   | sort -u
 ```
 
@@ -2015,7 +2025,7 @@ cd /srv/compose/jellyfin && docker compose pull && docker compose up -d
 cd /srv/compose/ollama && docker compose pull && docker compose up -d
 
 # Add service
-sudo mkdir -p /srv/compose/SERVICE-NAME /srv/appdata/SERVICE-NAME
+mkdir -p /srv/compose/SERVICE-NAME /srv/appdata/SERVICE-NAME
 nvim /srv/compose/SERVICE-NAME/compose.yaml
 cd /srv/compose/SERVICE-NAME && docker compose config && docker compose up -d
 
