@@ -129,6 +129,8 @@ mkdir -p ~/llm-jobs/{prompts,output,error,logs,running}
 
 ## Overnight job runner script
 
+Create the directory the script lives in, if it does not exist yet:
+
 ```bash
 mkdir -p ~/.local/bin
 ```
@@ -559,6 +561,9 @@ Expected location:
 ```text
 /home/you/.local/bin/llm-job
 ```
+
+If `command -v` printed nothing, `~/.local/bin` is not on this session's `PATH` yet - see
+[The job runner command is not found](#the-job-runner-command-is-not-found).
 
 ## Add shell aliases/functions
 
